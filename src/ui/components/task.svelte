@@ -150,7 +150,7 @@
 
 <style lang="scss">
 	.task {
-		background-color: var(--background-secondary-alt);
+		background-color: white;
 		border-radius: var(--radius-m);
 		border: var(--border-width) solid var(--background-modifier-border);
 		cursor: grab;
@@ -162,7 +162,7 @@
 		.task-body {
 			padding: var(--size-4-2);
 			display: grid;
-			gap: var(--size-4-2);
+			// gap: var(--size-4-2);
 			grid-template-columns: 1fr auto;
 
 			p {
@@ -177,9 +177,11 @@
 					cursor: text;
 					background-color: var(--color-base-25);
 					width: 100%;
+					font-size: var(--font-ui-small);
 				}
 
 				.content-preview {
+					font-size: var(--font-ui-small);
 					&:focus-within {
 						box-shadow: 0 0 0 3px
 							var(--background-modifier-border-focus);
@@ -189,8 +191,6 @@
 		}
 
 		.task-footer {
-			border-top: var(--border-width) solid
-				var(--background-modifier-border);
 			padding: var(--size-4-2);
 			padding-top: 0;
 

@@ -22,9 +22,15 @@
 		justify-content: center;
 		align-items: center;
 		border-radius: var(--radius-s);
-		transition: background linear 100ms;
-		cursor: pointer;
-		background: unset;
+		transition: background-color linear 100ms;
+		background-color: var(--color-base-0);
 		padding: 0;
+		border: none;
+		box-shadow: none;
+		color: var(--color-base-50); // Added this line to make the icon slightly gray
+
+		&:hover {
+			background-color: var(--color-base-20);
+		}
 	}
 </style>

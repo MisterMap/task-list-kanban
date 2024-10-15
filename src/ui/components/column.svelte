@@ -128,7 +128,6 @@
 				<IconButton icon="lucide-more-vertical" on:click={showMenu} />
 			{/if}
 		</div>
-		<div class="divide" />
 		<div class="tasks-wrapper">
 			<div class="tasks">
 				{#each sortedTasks as task}
@@ -162,12 +161,12 @@
 		display: flex;
 		flex-direction: column;
 		align-self: flex-start;
-		width: 300px;
+		width: 240px;
 		flex-shrink: 0;
-		padding: var(--size-4-3);
+		padding: 0;
 		border-radius: var(--radius-m);
-		border: var(--border-width) solid var(--background-modifier-border);
-		background-color: var(--background-secondary);
+		background-color: white;
+		border: none;
 
 		&.drop-active {
 			.tasks-wrapper {
@@ -187,7 +186,7 @@
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			height: 24px;
+			height: 36px;
 			flex-shrink: 0;
 
 			h2 {
@@ -195,13 +194,6 @@
 				font-weight: var(--font-bold);
 				margin: 0;
 			}
-		}
-
-		.divide {
-			width: calc(100% + calc(2 * var(--size-4-3)));
-			border-bottom: var(--border-width) solid
-				var(--background-modifier-border);
-			margin: var(--size-4-3) calc(-1 * var(--size-4-3));
 		}
 
 		.tasks-wrapper {
@@ -213,7 +205,7 @@
 			.tasks {
 				display: flex;
 				flex-direction: column;
-				gap: var(--size-4-2);
+				gap: var(--size-4-3);
 
 				button {
 					display: flex;

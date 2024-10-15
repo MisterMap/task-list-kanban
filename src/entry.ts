@@ -1,5 +1,5 @@
-import { MarkdownView, Plugin, TFile, WorkspaceLeaf } from "obsidian";
 import { KANBAN_VIEW_NAME, KanbanView } from "./ui/text_view";
+import { MarkdownView, Plugin, TFile, WorkspaceLeaf } from "obsidian";
 
 export default class Base extends Plugin {
 	async onload() {

@@ -1,6 +1,6 @@
 {
 	"name": "task-list-kanban",
-	"version": "1.2.8",
+	"version": "0.0.1",
 	"description": "Kanban plugin to create task lists",
 	"main": "main.js",
 	"scripts": {
@@ -10,7 +10,7 @@
 		"test": "vitest run"
 	},
 	"keywords": [],
-	"author": "",
+	"author": "Mikhail Kurenkov",
 	"license": "MIT",
 	"devDependencies": {
 		"@smui-extra/autocomplete": "^7.0.0",
@@ -20,11 +20,11 @@
 		"@types/showdown": "^2.0.6",
 		"@typescript-eslint/eslint-plugin": "7.10.0",
 		"@typescript-eslint/parser": "7.10.0",
-		"builtin-modules": "4.0.0",
-		"esbuild": "0.21.3",
+		"builtin-modules": "^4.0.0",
+		"esbuild": "^0.24.0",
 		"esbuild-svelte": "^0.8.1",
 		"obsidian": "latest",
-		"svelte": "^4.2.18",
+		"svelte": "^4.2.19",
 		"svelte-preprocess": "^5.1.4",
 		"tslib": "2.6.2",
 		"typescript": "5.4.5",
@@ -35,9 +35,12 @@
 		"esbuild-sass-plugin": "^3.3.0",
 		"front-matter": "^4.0.2",
 		"gray-matter": "^4.0.3",
+		"micromatch": "^4.0.8",
+		"rollup": "^4.24.0",
 		"sass": "^1.77.2",
 		"showdown": "^2.1.0",
 		"svelte-select": "^5.8.3",
+		"vite": "^5.4.9",
 		"zod": "^3.23.8"
 	}
 }

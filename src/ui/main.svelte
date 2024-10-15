@@ -85,18 +85,6 @@
 	<div class="settings">
 		<IconButton icon="lucide-settings" on:click={handleOpenSettings} />
 	</div>
-	<div class="controls">
-		<div class="text-filter">
-			<label for="filter">Filter by content:</label>
-			<input
-				name="filter"
-				type="search"
-				bind:value={filterText}
-				placeholder="Type to search..."
-			/>
-		</div>
-		<SelectTag tags={[...tags]} bind:value={selectedTags} />
-	</div>
 
 	<div class="columns">
 		<div>
@@ -142,41 +130,19 @@
 			justify-content: flex-end;
 		}
 
-		.controls {
-			margin-bottom: var(--size-4-4);
-			display: grid;
-			gap: var(--size-4-8);
-			grid-template-columns: 1fr 1fr;
-
-			.text-filter {
-				display: flex;
-				flex-direction: column;
-				flex-grow: 1;
-
-				label {
-					display: inline-block;
-					margin-bottom: var(--size-4-1);
-
-					~ input[type="search"] {
-						display: block;
-						flex-grow: 1;
-						background: var(--background-primary);
-					}
-				}
-			}
-		}
-
 		.columns {
 			height: 100%;
 			flex-grow: 1;
 			max-width: 100vw;
 			overflow-x: scroll;
-			padding-bottom: var(--size-4-3);
+			padding-bottom: var(--size-4-4);
 
 			> div {
 				display: flex;
-				gap: var(--size-4-3);
+				gap: var(--size-4-4);
+				background-color: white;
 			}
+
 		}
 	}
 </style>
