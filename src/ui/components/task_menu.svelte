@@ -9,6 +9,7 @@
 	export let task: Task;
 	export let taskActions: TaskActions;
 	export let columnTagTableStore: Readable<ColumnTagTable>;
+	export let menuColor: string = 'var(--color-base-50)';
 
 	function showMenu(e: MouseEvent) {
 		const menu = new Menu();
@@ -68,4 +69,4 @@
 	}
 </script>
 
-<IconButton icon="lucide-more-vertical" on:click={showMenu} />
+<IconButton icon="lucide-more-vertical" on:click={showMenu} menuColor={menuColor} />

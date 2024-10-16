@@ -94,6 +94,26 @@
 	}
 
 	$: shouldconsolidateTags = consolidateTags && task.tags.size > 0;
+
+	$: priorityColor = getPriorityColor(task.priority);
+	$: borderWidth = getBorderWidth(task.priority);
+
+	function getPriorityColor(priority: number): string {
+		switch (priority) {
+			case 0:
+				return '#FFB6C1'; // Light pink color in hex code
+			case 1:
+				return '#FFA500'; // Carrot color in hex code
+			case 2:
+				return '#87CEEB'; // Light green color in hex code
+			default:
+				return 'var(--background-modifier-border)';
+		}
+	}
+
+	function getBorderWidth(priority: number): string {
+		return priority >= 0 && priority <= 2 ? '2px' : 'var(--border-width)';
+	}
 </script>
 
 <div
@@ -103,6 +123,7 @@
 	draggable={!isEditing}
 	on:dragstart={handleDragStart}
 	on:dragend={handleDragEnd}
+	style="border: {borderWidth} solid {priorityColor};"
 >
 	<div class="task-body">
 		<div class="task-content">
@@ -127,7 +148,7 @@
 				</div>
 			{/if}
 		</div>
-		<TaskMenu {task} {taskActions} {columnTagTableStore} />
+		<TaskMenu {task} {taskActions} {columnTagTableStore} menuColor={priorityColor} />
 	</div>
 	{#if showFilepath}
 		<div class="task-footer">

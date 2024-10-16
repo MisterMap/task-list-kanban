@@ -37,13 +37,17 @@
 
 	$: columnTitle = getColumnTitle(column, $columnTagTableStore);
 
-	$: sortedTasks = tasks.sort((a, b) => {
-		if (a.path === b.path) {
-			return a.rowIndex - b.rowIndex;
-		} else {
-			return a.path.localeCompare(b.path);
+	function sortTasksByPriorityAndPath(a: Task, b: Task) {
+		if (a.priority !== b.priority) {
+			return a.priority - b.priority; // Sort by priority descending
 		}
-	});
+		if (a.path === b.path) {
+			return a.rowIndex - b.rowIndex; // Sort by rowIndex if paths are the same
+		}
+		return a.path.localeCompare(b.path); // Sort by path
+	}
+
+	$: sortedTasks = tasks.sort(sortTasksByPriorityAndPath);
 
 	function showMenu(e: MouseEvent) {
 		const menu = new Menu();
@@ -211,6 +215,7 @@
 					display: flex;
 					align-items: center;
 					cursor: pointer;
+					box-shadow: none; // Add this line to remove the shadow
 
 					span {
 						height: 18px;

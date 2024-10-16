@@ -62,6 +62,7 @@ export function createTaskActions({
 		},
 
 		async updateContent(id, content) {
+			console.log("Updating task content:", content);
 			await updateRowWithTask(id, (task) => (task.content = content));
 		},
 

@@ -2,6 +2,7 @@
 	import { setIcon } from "obsidian";
 
 	export let icon: string;
+	export let menuColor: string = 'var(--color-base-50)';
 
 	let element: HTMLSpanElement;
 	$: {
@@ -12,7 +13,7 @@
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<button bind:this={element} on:click></button>
+<button bind:this={element} on:click style="color: {menuColor};"></button>
 
 <style lang="scss">
 	button {
@@ -27,7 +28,6 @@
 		padding: 0;
 		border: none;
 		box-shadow: none;
-		color: var(--color-base-50); // Added this line to make the icon slightly gray
 
 		&:hover {
 			background-color: var(--color-base-20);

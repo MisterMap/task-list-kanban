@@ -1,7 +1,8 @@
-import sha256 from "crypto-js/sha256";
-import type { Brand } from "src/brand";
 import type { ColumnTag, ColumnTagTable } from "../columns/columns";
+
+import type { Brand } from "src/brand";
 import { getTagsFromContent } from "src/parsing/tags/tags";
+import sha256 from "crypto-js/sha256";
 
 export class Task {
 	constructor(
@@ -35,6 +36,16 @@ export class Task {
 		this.content = content;
 		this._done = status === "x";
 		this._path = fileHandle.path;
+		this._priority = (() => {
+			let priority = 3;
+			for (let i = 3; i >= 0; i--) {
+				if (tags.has(`p${i}`)) {
+					tags.delete(`p${i}`);
+					priority = i;
+				}
+			}
+			return priority;
+		})();
 
 		for (const tag of tags) {
 			if (tag in columnTagTable || tag === "done") {
@@ -93,6 +104,14 @@ export class Task {
 		this._done = false;
 	}
 
+	private _priority: number = 0;
+	get priority(): number {
+		return this._priority;
+	}
+	set priority(value: number) {
+		this._priority = Math.max(0, Math.min(3, value));
+	}
+
 	readonly blockLink: string | undefined;
 	readonly tags: ReadonlySet<string>;
 
@@ -110,6 +129,7 @@ export class Task {
 						.join(" ")}`
 				: "",
 			this.column ? ` #${this.column}` : "",
+			this._priority < 3 ? ` #p${this._priority}` : "",
 			this.blockLink ? ` ^${this.blockLink}` : "",
 		]
 			.join("")
