@@ -103,7 +103,7 @@
 			case 0:
 				return '#FFB6C1'; // Light pink color in hex code
 			case 1:
-				return '#FFA500'; // Carrot color in hex code
+				return '#FFD700'; // Gold color in hex code (brighter than Moccasin)
 			case 2:
 				return '#87CEEB'; // Light green color in hex code
 			default:

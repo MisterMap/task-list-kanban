@@ -33,7 +33,7 @@ export class Task {
 		const tags = getTagsFromContent(content);
 
 		this._id = sha256(content + fileHandle.path + rowIndex).toString();
-		this.content = content;
+		this._content = content;
 		this._done = status === "x";
 		this._path = fileHandle.path;
 		this._priority = (() => {
@@ -41,6 +41,8 @@ export class Task {
 			for (let i = 3; i >= 0; i--) {
 				if (tags.has(`p${i}`)) {
 					tags.delete(`p${i}`);
+					// Remove priority tag from content
+					this._content = this._content.replace(`#p${i}`, "").trim();
 					priority = i;
 				}
 			}
@@ -54,13 +56,13 @@ export class Task {
 				}
 				tags.delete(tag);
 				if (!consolidateTags) {
-					this.content = this.content
+					this._content = this._content
 						.replaceAll(`#${tag}`, "")
 						.trim();
 				}
 			}
 			if (consolidateTags) {
-				this.content = this.content.replaceAll(`#${tag}`, "").trim();
+				this._content = this._content.replaceAll(`#${tag}`, "").trim();
 			}
 		}
 
@@ -77,7 +79,19 @@ export class Task {
 		return this._id;
 	}
 
-	content: string;
+	private _content: string;
+	get content(): string {
+		return this._content;
+	}
+	set content(value: string) {
+		// Update priority and remove it from content
+		const priorityMatch = value.match(/#p([0-3])/);
+		if (priorityMatch && priorityMatch[1] !== undefined) {
+			this._priority = parseInt(priorityMatch[1]);
+			value = value.replace(/#p[0-3]/, '').trim();
+		}
+		this._content = value;
+	}
 
 	private _done: boolean;
 	get done(): boolean {
