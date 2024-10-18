@@ -114,7 +114,7 @@
 		return $columnTagTableStore[column as ColumnTag]?.maxTasks ?? -1;
 	}
 
-	function isMoreThanMaxTasks(column: ColumnTag | DefaultColumns, tasks: Task[], columnTagTableStore: ColumnTagTable) {
+	function isMoreThanMaxTasks(column: ColumnTag | DefaultColumns, tasks: Task[]) {
 		const maxTasks = getMaxTasks(column);
 		if (maxTasks === -1) {
 			return false;
@@ -122,7 +122,7 @@
 		return tasks.length > maxTasks;
 	}
 
-	function getTaskCountText(column: ColumnTag | DefaultColumns, tasks: Task[], columnTagTableStore: ColumnTagTable) {
+	function getTaskCountText(column: ColumnTag | DefaultColumns, tasks: Task[]) {
 		const maxTasks = getMaxTasks(column);
 		if (maxTasks === -1) {
 			return `${tasks.length}`;
@@ -152,8 +152,8 @@
 		<div class="header">
 			<h2>
 				{columnTitle}
-				<span class="task-count" class:highlight={isMoreThanMaxTasks(column, tasks, columnTagTableStore)}>
-					{getTaskCountText(column, tasks, columnTagTableStore)}
+				<span class="task-count" class:highlight={isMoreThanMaxTasks(column, tasks)}>
+					{getTaskCountText(column, tasks)}
 				</span>
 			</h2>
 			{#if column === "done"}
