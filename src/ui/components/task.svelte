@@ -93,7 +93,7 @@
 		e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
 	}
 
-	$: shouldconsolidateTags = consolidateTags && task.tags.size > 0;
+	$: shouldconsolidateTags = consolidateTags && (task.tags.size > 0 || task.dueDate);
 
 	$: priorityColor = getPriorityColor(task.priority);
 	$: borderWidth = getBorderWidth(task.priority);
@@ -165,6 +165,16 @@
 					>
 				</span>
 			{/each}
+			{#if task.dueDate}
+				<span>
+					<span
+						class="due-date"
+						style="background-color: {new Date() < task.dueDate ? 'white' : 'var(--text-accent)'};
+						       color: {new Date() < task.dueDate ? 'inherit' : 'white'};">
+						{task.dueDate.toISOString().split('T')[0]}
+					</span>
+				</span>
+			{/if}
 		</div>
 	{/if}
 </div>
@@ -227,6 +237,13 @@
 			gap: var(--size-4-1) var(--size-2-1);
 			padding: var(--size-4-2) var(--size-2-2);
 			padding-top: 0;
+		}
+
+		.due-date {
+			padding: 0.2em 0.4em;
+			border-radius: 12px;
+			font-size: var(--font-ui-small);
+			color: var(--text-accent);
 		}
 	}
 

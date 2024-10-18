@@ -49,6 +49,10 @@ export class Task {
 			return priority;
 		})();
 
+		const { content: contentWithoutDate, date } = this.extractDueDate(this._content);
+		this._content = contentWithoutDate;
+		this._dueDate = date;
+
 		for (const tag of tags) {
 			if (tag in columnTagTable || tag === "done") {
 				if (!this._column) {
@@ -90,7 +94,9 @@ export class Task {
 			this._priority = parseInt(priorityMatch[1]);
 			value = value.replace(/#p[0-3]/, '').trim();
 		}
-		this._content = value;
+		const { content: contentWithoutDate, date } = this.extractDueDate(value);
+		this._content = contentWithoutDate;
+		this._dueDate = date ?? this._dueDate;
 	}
 
 	private _done: boolean;
@@ -126,6 +132,14 @@ export class Task {
 		this._priority = Math.max(0, Math.min(3, value));
 	}
 
+	private _dueDate: Date | null = null;
+	get dueDate(): Date | null {
+		return this._dueDate;
+	}
+	set dueDate(value: Date | null) {
+		this._dueDate = value;
+	}
+
 	readonly blockLink: string | undefined;
 	readonly tags: ReadonlySet<string>;
 
@@ -142,6 +156,7 @@ export class Task {
 						.map((tag) => `#${tag}`)
 						.join(" ")}`
 				: "",
+			this._dueDate ? ` ${this._dueDate.toISOString().split('T')[0]}` : "",
 			this.column ? ` #${this.column}` : "",
 			this._priority < 3 ? ` #p${this._priority}` : "",
 			this.blockLink ? ` ^${this.blockLink}` : "",
@@ -157,6 +172,19 @@ export class Task {
 
 	delete() {
 		this._deleted = true;
+	}
+
+	private extractDueDate(content: string): { content: string; date: Date | null } {
+		const dueDateMatch = content.match(/\s*(\d{4}-\d{2}-\d{2})/);
+		if (!dueDateMatch || !dueDateMatch[1]) {
+			return { content, date: null };
+		}
+		const date = new Date(dueDateMatch[1]);
+		if (isNaN(date.getTime())) {
+			return { content, date: null };
+		}
+		const newContent = content.replace(dueDateMatch[0], '').trim();
+		return { content: newContent, date };
 	}
 }
 
