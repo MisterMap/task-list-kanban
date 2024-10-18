@@ -127,7 +127,10 @@
 		on:drop={handleDrop}
 	>
 		<div class="header">
-			<h2>{columnTitle}</h2>
+			<h2>
+				{columnTitle}
+				<span class="task-count">{tasks.length}</span>
+			</h2>
 			{#if column === "done"}
 				<IconButton icon="lucide-more-vertical" on:click={showMenu} />
 			{/if}
@@ -197,6 +200,15 @@
 				font-size: var(--font-ui-larger);
 				font-weight: var(--font-bold);
 				margin: 0;
+
+				.task-count {
+					background-color: var(--color-accent);
+					color: white;
+					border-radius: 12px;
+					padding: 0 8px;
+					font-size: 0.8em;
+					margin-left: 8px;
+				}
 			}
 		}
 
