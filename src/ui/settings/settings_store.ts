@@ -4,7 +4,7 @@ import { writable } from "svelte/store";
 import { z } from "zod";
 
 const settingsObject = z.object({
-	columns: z.array(z.string()),
+	columns: z.array(z.object({ name: z.string(), maxTasks: z.number().default(10) })),
 	scope: z.union([z.literal("everywhere"), z.literal("folder")]),
 	showFilepath: z.boolean().default(true).optional(),
 	consolidateTags: z.boolean().default(false).optional(),
@@ -13,7 +13,7 @@ const settingsObject = z.object({
 export type SettingValues = z.infer<typeof settingsObject>;
 
 const defaultSettings: SettingValues = {
-	columns: ["Later", "Soonish", "Next week", "This week", "Today", "Pending"],
+	columns: [{ name: "Later", maxTasks: 10 }, { name: "Soonish", maxTasks: 10 }, { name: "Next week", maxTasks: 10 }, { name: "This week", maxTasks: 10 }, { name: "Today", maxTasks: 10 }, { name: "Pending", maxTasks: 10 }],
 	scope: "folder",
 	showFilepath: true,
 	consolidateTags: false,

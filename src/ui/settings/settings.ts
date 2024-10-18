@@ -1,6 +1,7 @@
 //
 
 import { App, Modal, Setting } from "obsidian";
+
 import type { SettingValues } from "./settings_store";
 
 export class SettingsModal extends Modal {
@@ -16,28 +17,29 @@ export class SettingsModal extends Modal {
 
 		new Setting(this.contentEl)
 			.setName("Columns")
-			.setDesc('The column names separated by a comma ","')
+			.setDesc('The column names and max tasks separated by a comma "," and colon ":" for max tasks')
 			.setClass("column")
 			.addText((text) => {
-				text.setValue(this.settings.columns.join(", "));
+				text.setValue(this.settings.columns.map(c => `${c.name}:${c.maxTasks}`).join(", "));
 				text.onChange((value) => {
-					this.settings.columns = value
-						.split(",")
-						.map((column) => column.trim());
+					this.settings.columns = value.split(",").map((column) => {
+						const [name, maxTasks] = column.split(":");
+						return { name: name?.trim() ?? "", maxTasks: parseInt(maxTasks ?? "10", 10) || 10 };
+					});
 				});
 			});
 
 		new Setting(this.contentEl)
 			.setName("Folder scope")
 			.setDesc("Where should we try to find tasks for this Kanban?")
-			.addDropdown((dropdown) => {
-				dropdown.addOption("folder", "This folder");
-				dropdown.addOption("everywhere", "Every folder");
-				dropdown.setValue(this.settings.scope);
-				dropdown.onChange((value) => {
-					this.settings.scope = value as "folder" | "everywhere";
+				.addDropdown((dropdown) => {
+					dropdown.addOption("folder", "This folder");
+					dropdown.addOption("everywhere", "Every folder");
+					dropdown.setValue(this.settings.scope);
+					dropdown.onChange((value) => {
+						this.settings.scope = value as "folder" | "everywhere";
+					});
 				});
-			});
 
 		new Setting(this.contentEl)
 			.setName("Show filepath")

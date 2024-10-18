@@ -101,7 +101,7 @@
 	function getPriorityColor(priority: number): string {
 		switch (priority) {
 			case 0:
-				return '#FFB6C1'; // Light pink color in hex code
+				return 'coral'; // Light pink color in hex code
 			case 1:
 				return '#FFD700'; // Gold color in hex code (brighter than Moccasin)
 			case 2:

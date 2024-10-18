@@ -31,7 +31,7 @@
 			case "uncategorised":
 				return "Uncategorised";
 			default:
-				return columnTagTable[column];
+				return columnTagTable[column]?.name ?? "Undefined";
 		}
 	}
 
@@ -107,6 +107,29 @@
 		}
 	}
 
+	function getMaxTasks(column: ColumnTag | DefaultColumns) {
+		if (!isColumnTag(column, columnTagTableStore)) {
+			return -1;
+		}
+		return $columnTagTableStore[column as ColumnTag]?.maxTasks ?? -1;
+	}
+
+	function isMoreThanMaxTasks(column: ColumnTag | DefaultColumns, tasks: Task[], columnTagTableStore: ColumnTagTable) {
+		const maxTasks = getMaxTasks(column);
+		if (maxTasks === -1) {
+			return false;
+		}
+		return tasks.length > maxTasks;
+	}
+
+	function getTaskCountText(column: ColumnTag | DefaultColumns, tasks: Task[], columnTagTableStore: ColumnTagTable) {
+		const maxTasks = getMaxTasks(column);
+		if (maxTasks === -1) {
+			return `${tasks.length}`;
+		}
+		return `${tasks.length} / ${maxTasks}`;
+	}
+
 	let buttonEl: HTMLSpanElement | undefined;
 
 	$: {
@@ -129,7 +152,9 @@
 		<div class="header">
 			<h2>
 				{columnTitle}
-				<span class="task-count">{tasks.length}</span>
+				<span class="task-count" class:highlight={isMoreThanMaxTasks(column, tasks, columnTagTableStore)}>
+					{getTaskCountText(column, tasks, columnTagTableStore)}
+				</span>
 			</h2>
 			{#if column === "done"}
 				<IconButton icon="lucide-more-vertical" on:click={showMenu} />
@@ -208,6 +233,12 @@
 					padding: 0 8px;
 					font-size: 0.8em;
 					margin-left: 8px;
+					font-weight: var(--font-normal); // Added this line to make the font less bold
+
+					&.highlight {
+						background-color: coral;
+						color: white;
+					}
 				}
 			}
 		}
@@ -236,4 +267,6 @@
 			}
 		}
 	}
+
+
 </style>

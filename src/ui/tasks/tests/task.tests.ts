@@ -5,7 +5,7 @@ import { kebab } from "src/parsing/kebab/kebab";
 
 describe("Task", () => {
 	const columnTags: ColumnTagTable = {
-		[kebab<ColumnTag>("column")]: "column",
+		[kebab<ColumnTag>("column")]: { name: "column", maxTasks: -1 },
 	};
 
 	it("parses a basic task string", () => {
@@ -29,7 +29,7 @@ describe("Task", () => {
 
 		expect(task).toBeTruthy();
 		expect(task?.content).toBe("Something #tag");
-		expect(task?.column).toBe("column");
+		expect(task?.column).toBe(kebab<ColumnTag>("column"));
 	});
 
 	it("serialises a basic task string with a column", () => {
@@ -40,7 +40,7 @@ describe("Task", () => {
 		}
 
 		const output = task?.serialise();
-		expect(taskString).toBe(output);
+		expect(output).toBe(taskString);
 	});
 
 	it("serialises a basic task string with a column and consolidate tags", () => {
@@ -51,7 +51,7 @@ describe("Task", () => {
 		}
 
 		const output = task?.serialise();
-		expect(taskString).toBe(output);
+		expect(output).toBe(taskString);
 	});
 
 	it("parses a task string with a block link", () => {
@@ -71,10 +71,10 @@ describe("Task", () => {
 		const taskString = "- [ ] Something #tag ^link-link";
 		if (isTaskString(taskString)) {
 			task = new Task(taskString, { path: "/" }, 0, columnTags, false);
-			task.column = "column" as ColumnTag;
+			task.column = kebab<ColumnTag>("column");
 		}
 
 		const output = task?.serialise();
-		expect("- [ ] Something #tag #column ^link-link").toBe(output);
+		expect(output).toBe("- [ ] Something #tag #column ^link-link");
 	});
 });

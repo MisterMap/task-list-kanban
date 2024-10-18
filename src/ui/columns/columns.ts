@@ -6,7 +6,7 @@ import type { SettingValues } from "../settings/settings_store";
 export type DefaultColumns = "uncategorised" | "done";
 export type ColumnTag = Brand<string, "ColumnTag">;
 
-export type ColumnTagTable = Record<ColumnTag, string>;
+export type ColumnTagTable = Record<ColumnTag, { name: string; maxTasks: number }>;
 
 export const createColumnTagTableStore = (
 	settingsStore: Writable<SettingValues>
@@ -15,7 +15,7 @@ export const createColumnTagTableStore = (
 		const output: ColumnTagTable = {};
 
 		for (const column of settings.columns ?? []) {
-			output[kebab<ColumnTag>(column)] = column;
+			output[kebab<ColumnTag>(column.name)] = column;
 		}
 
 		return output;

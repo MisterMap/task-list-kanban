@@ -33,7 +33,7 @@
 
 		for (const [tag, label] of Object.entries($columnTagTableStore)) {
 			menu.addItem((i) => {
-				i.setTitle(`Move to ${label}`).onClick(() =>
+				i.setTitle(`Move to ${label.name}`).onClick(() =>
 					taskActions.changeColumn(task.id, tag as ColumnTag),
 				);
 				if (task.column === tag) {
