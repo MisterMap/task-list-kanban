@@ -8,6 +8,8 @@ const settingsObject = z.object({
 	scope: z.union([z.literal("everywhere"), z.literal("folder")]),
 	showFilepath: z.boolean().default(true).optional(),
 	consolidateTags: z.boolean().default(false).optional(),
+	match_pattern: z.string().optional(),
+	no_match_pattern: z.string().optional(),
 });
 
 export type SettingValues = z.infer<typeof settingsObject>;
@@ -17,6 +19,8 @@ const defaultSettings: SettingValues = {
 	scope: "folder",
 	showFilepath: true,
 	consolidateTags: false,
+	match_pattern: '',
+	no_match_pattern: '',
 };
 
 export const createSettingsStore = () =>

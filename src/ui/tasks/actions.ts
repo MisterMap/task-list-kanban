@@ -8,6 +8,8 @@ import {
 import type { Task } from "./task";
 import type { Metadata } from "./tasks";
 import type { ColumnTag } from "../columns/columns";
+import type { SettingValues } from "../settings/settings_store";
+import { get, type Readable } from "svelte/store";
 
 export type TaskActions = {
 	changeColumn: (id: string, column: ColumnTag) => Promise<void>;
@@ -24,11 +26,13 @@ export function createTaskActions({
 	metadataByTaskId,
 	vault,
 	workspace,
+	settingsStore,
 }: {
 	tasksByTaskId: Map<string, Task>;
 	metadataByTaskId: Map<string, Metadata>;
 	vault: Vault;
 	workspace: Workspace;
+	settingsStore: Readable<SettingValues>;
 }): TaskActions {
 	async function updateRowWithTask(
 		id: string,
@@ -116,7 +120,14 @@ export function createTaskActions({
 						});
 				});
 
+				const { match_pattern, no_match_pattern } = get(settingsStore);
 				for (const [label, folderItem] of Object.entries(folder)) {
+					if (match_pattern && !label.match(match_pattern)) {
+						continue;
+					}
+					if (no_match_pattern && label.match(no_match_pattern)) {
+						continue;
+					}
 					menu.addItem((i) => {
 						i.setTitle(
 							folderItem instanceof TFile ? label : label + " →"

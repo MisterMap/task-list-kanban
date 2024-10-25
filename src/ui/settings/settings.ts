@@ -63,6 +63,27 @@ export class SettingsModal extends Modal {
 				});
 			});
 
+		new Setting(this.contentEl)
+			.setName("Match Pattern")
+			.setDesc("Pattern to match tasks during creation")
+			.addText((text) => {
+				text.setValue(this.settings.match_pattern ?? '');
+				text.onChange((value) => {
+					this.settings.match_pattern = value;
+					console.log(`Match pattern set to: ${value}`);
+				});
+			});
+
+		new Setting(this.contentEl)
+			.setName("No Match Pattern")
+			.setDesc("Pattern to exclude tasks during creation")
+			.addText((text) => {
+				text.setValue(this.settings.no_match_pattern ?? '');
+				text.onChange((value) => {
+					this.settings.no_match_pattern = value;
+				});
+			});
+
 		new Setting(this.contentEl).addButton((btn) =>
 			btn.setButtonText("Save").onClick(() => {
 				this.close();
