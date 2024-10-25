@@ -1,3 +1,10 @@
+:root {
+  --color-p0: #FF7F50;
+  /* --color-p0: #FF0000; */
+  --color-p1: #ffd700;
+  --color-p2: #87ceeb;
+}
+
 /*
 
 This CSS file will be included with your plugin, and

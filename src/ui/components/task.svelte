@@ -98,21 +98,34 @@
 	$: priorityColor = getPriorityColor(task.priority);
 	$: borderWidth = getBorderWidth(task.priority);
 
+	const priorityColors = {
+		0: 'var(--color-p0)',
+		1: 'var(--color-p1)',
+		2: 'var(--color-p2)',
+		default: 'var(--background-modifier-border)'
+	};
+
 	function getPriorityColor(priority: number): string {
-		switch (priority) {
-			case 0:
-				return 'coral'; // Light pink color in hex code
-			case 1:
-				return '#FFD700'; // Gold color in hex code (brighter than Moccasin)
-			case 2:
-				return '#87CEEB'; // Light green color in hex code
-			default:
-				return 'var(--background-modifier-border)';
-		}
+		return priorityColors[priority as keyof typeof priorityColors] || priorityColors.default;
 	}
 
 	function getBorderWidth(priority: number): string {
-		return priority >= 0 && priority <= 2 ? '2px' : 'var(--border-width)';
+		return priority >= 0 && priority <= 2 ? '1.5px' : 'var(--border-width)';
+	}
+
+	function getDueDateBackgroundColor(dueDate: Date): string {
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+		const tomorrow = new Date(today);
+		tomorrow.setDate(tomorrow.getDate() + 1);
+
+		if (dueDate < today) {
+			return 'var(--color-p0)'; // past due
+		} else if (dueDate < tomorrow) {
+			return 'var(--color-p1)'; // due today
+		} else {
+			return 'var(--color-p2)'; // due in the future
+		}
 	}
 </script>
 
@@ -128,14 +141,14 @@
 	<div class="task-body">
 		<div class="task-content">
 			{#if isEditing}
-				<textarea
-					class:editing={isEditing}
-					bind:this={textAreaEl}
-					on:keypress={handleKeypress}
-					on:blur={handleContentBlur}
-					on:input={onInput}
-					value={task.content.replaceAll("<br />", "\n")}
-				/>
+					<textarea
+						class:editing={isEditing}
+						bind:this={textAreaEl}
+						on:keypress={handleKeypress}
+						on:blur={handleContentBlur}
+						on:input={onInput}
+						value={task.content.replaceAll("<br />", "\n")}
+					/>
 			{:else}
 				<div
 					role="button"
@@ -169,8 +182,11 @@
 				<span>
 					<span
 						class="due-date"
-						style="background-color: {new Date() < task.dueDate ? 'white' : 'var(--text-accent)'};
-						       color: {new Date() < task.dueDate ? 'inherit' : 'white'};">
+						style="background-color: var(--background-primary);
+						       border-color: {getDueDateBackgroundColor(task.dueDate)};
+						       border-width: 1.5px;
+						       border-style: solid;
+						       color: var(--text-normal);">
 						{task.dueDate.toISOString().split('T')[0]}
 					</span>
 				</span>
