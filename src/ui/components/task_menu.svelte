@@ -29,6 +29,15 @@
 			);
 		});
 
+		menu.addItem((i) => {
+			i.setTitle(`Move to Done`).onClick(() =>
+				taskActions.markDone(task.id),
+			);
+			if (task.done) {
+				i.setDisabled(true);
+			}
+		});
+
 		menu.addSeparator();
 
 		for (const [tag, label] of Object.entries($columnTagTableStore)) {
@@ -41,15 +50,6 @@
 				}
 			});
 		}
-
-		menu.addItem((i) => {
-			i.setTitle(`Move to Done`).onClick(() =>
-				taskActions.markDone(task.id),
-			);
-			if (task.done) {
-				i.setDisabled(true);
-			}
-		});
 
 		menu.addSeparator();
 
