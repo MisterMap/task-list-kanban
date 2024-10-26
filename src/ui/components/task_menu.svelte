@@ -9,7 +9,7 @@
 	export let task: Task;
 	export let taskActions: TaskActions;
 	export let columnTagTableStore: Readable<ColumnTagTable>;
-	export let menuColor: string = 'var(--color-base-50)';
+	export let menuColor: string = "var(--color-base-50)";
 
 	function showMenu(e: MouseEvent) {
 		const menu = new Menu();
@@ -53,6 +53,50 @@
 
 		menu.addSeparator();
 
+		// Add priority menu items
+		for (let priority = 0; priority <= 3; priority++) {
+			menu.addItem((i) => {
+				i.setTitle(`p${priority}`).onClick(() =>
+					taskActions.updatePriority(task.id, priority),
+				);
+				if (task.priority === priority) {
+					i.setDisabled(true);
+				}
+			});
+		}
+		menu.addSeparator();
+
+		menu.addItem((i) => {
+			i.setTitle("Today").onClick(() => {
+				const today = new Date();
+				taskActions.updateDueDate(task.id, today);
+			});
+		});
+
+		menu.addItem((i) => {
+			i.setTitle("Tomorrow").onClick(() => {
+				const tomorrow = new Date();
+				tomorrow.setDate(tomorrow.getDate() + 1);
+				taskActions.updateDueDate(task.id, tomorrow);
+			});
+		});
+
+		menu.addItem((i) => {
+			i.setTitle("Remove due date").onClick(() => {
+				taskActions.updateDueDate(task.id, null);
+			});
+		});
+
+		menu.addSeparator();
+
+		menu.addItem((i) => {
+			i.setTitle("Change project").onClick((event) => {
+				taskActions.changeProject(task.id, event as MouseEvent);
+			});
+		});
+
+		menu.addSeparator();
+
 		menu.addItem((i) => {
 			i.setTitle(`Archive task`).onClick(() =>
 				taskActions.archiveTasks([task.id]),
@@ -69,4 +113,4 @@
 	}
 </script>
 
-<IconButton icon="lucide-more-vertical" on:click={showMenu} menuColor={menuColor} />
+<IconButton icon="lucide-more-vertical" on:click={showMenu} {menuColor} />

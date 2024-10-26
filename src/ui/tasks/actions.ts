@@ -19,6 +19,9 @@ export type TaskActions = {
 	archiveTasks: (ids: string[]) => Promise<void>;
 	deleteTask: (ids: string) => Promise<void>;
 	addNew: (column: ColumnTag, e: MouseEvent) => Promise<void>;
+	updatePriority: (id: string, priority: number) => Promise<void>;
+	updateDueDate: (id: string, dueDate: Date | null) => Promise<void>;
+	changeProject: (id: string, e: MouseEvent) => Promise<void>;
 };
 
 export function createTaskActions({
@@ -55,6 +58,84 @@ export function createTaskActions({
 			newTaskString
 		);
 	}
+
+	interface Folder {
+		[label: string]: Folder | TFile;
+	}
+
+	function createFolderStructure(): Folder {
+		const files = vault
+			.getMarkdownFiles()
+			.sort((a, b) => a.path.localeCompare(b.path));
+		const folder: Folder = {};
+	
+		for (const file of files) {
+			const segments = file.path.split("/");
+	
+			let currFolder = folder;
+			for (const [i, segment] of segments.entries()) {
+				if (i === segments.length - 1) {
+					currFolder[segment] = file;
+				} else {
+					const nextFolder = currFolder[segment] || {};
+					if (nextFolder instanceof TFile) {
+						continue;
+					}
+					currFolder[segment] = nextFolder;
+					currFolder = nextFolder;
+				}
+			}
+		}
+	
+		return folder;
+	}
+
+	function createMenuForFolder(folder: Folder, event: MouseEvent, onFileSelect: (file: TFile) => void) {
+		const target = event.target as HTMLButtonElement | undefined;
+		if (!target) {
+			return;
+		}
+
+		const boundingRect = target.getBoundingClientRect();
+		const y = boundingRect.top + boundingRect.height / 2;
+		const x = boundingRect.left + boundingRect.width / 2;
+
+		function createMenu(folderItem: Folder | TFile, parentMenu: Menu | undefined) {
+			const menu = new Menu();
+			menu.addItem((i) => {
+				i.setTitle(parentMenu ? `← back` : "Choose a file")
+					.setDisabled(!parentMenu)
+					.onClick(() => {
+						parentMenu?.showAtPosition({ x, y });
+					});
+			});
+	
+			const { match_pattern, no_match_pattern } = get(settingsStore);
+			for (const [label, item] of Object.entries(folderItem)) {
+				if (match_pattern && !label.match(match_pattern)) {
+					continue;
+				}
+				if (no_match_pattern && label.match(no_match_pattern)) {
+					continue;
+				}
+				menu.addItem((i) => {
+					i.setTitle(item instanceof TFile ? label : label + " →")
+						.onClick(() => {
+							if (item instanceof TFile) {
+								onFileSelect(item);
+							} else {
+								createMenu(item, menu);
+							}
+						});
+				});
+			}
+	
+			menu.showAtPosition({ x, y });
+		}
+	
+		createMenu(folder, undefined);
+	}
+	
 
 	return {
 		async changeColumn(id, column) {
@@ -96,86 +177,42 @@ export function createTaskActions({
 			editorView?.editor.setCursor(rowIndex);
 		},
 
-		async addNew(column, e) {
-			const files = vault
-				.getMarkdownFiles()
-				.sort((a, b) => a.path.localeCompare(b.path));
+		async addNew(column, event) {
+			const folder = createFolderStructure();
+			createMenuForFolder(folder, event, (file) => {
+				updateRow(
+					vault,
+					file,
+					undefined,
+					`- [ ]  #${column}`
+				);
+			});
+		},
 
-			const target = e.target as HTMLButtonElement | undefined;
-			if (!target) {
-				return;
-			}
+		async updatePriority(id, priority) {
+			await updateRowWithTask(id, (task) => (task.priority = priority));
+		},
 
-			const boundingRect = target.getBoundingClientRect();
-			const y = boundingRect.top + boundingRect.height / 2;
-			const x = boundingRect.left + boundingRect.width / 2;
+		async updateDueDate(id, dueDate) {
+			await updateRowWithTask(id, (task) => (task.dueDate = dueDate));
+		},
 
-			function createMenu(folder: Folder, parentMenu: Menu | undefined) {
-				const menu = new Menu();
-				menu.addItem((i) => {
-					i.setTitle(parentMenu ? `← back` : "Choose a file")
-						.setDisabled(!parentMenu)
-						.onClick(() => {
-							parentMenu?.showAtPosition({ x: x, y: y });
-						});
-				});
+		async changeProject(id: string, event: MouseEvent) {
+			const task = tasksByTaskId.get(id);
+			if (!task) return;
+			const folder = createFolderStructure();
+			createMenuForFolder(folder, event, async (file) => {
+				const newTaskString = task?.serialise();
+				if (!newTaskString) return;
+				await updateRow(vault, file, undefined, newTaskString);
 
-				const { match_pattern, no_match_pattern } = get(settingsStore);
-				for (const [label, folderItem] of Object.entries(folder)) {
-					if (match_pattern && !label.match(match_pattern)) {
-						continue;
-					}
-					if (no_match_pattern && label.match(no_match_pattern)) {
-						continue;
-					}
-					menu.addItem((i) => {
-						i.setTitle(
-							folderItem instanceof TFile ? label : label + " →"
-						).onClick(() => {
-							if (folderItem instanceof TFile) {
-								updateRow(
-									vault,
-									folderItem,
-									undefined,
-									`- [ ]  #${column}`
-								);
-							} else {
-								createMenu(folderItem, menu);
-							}
-						});
-					});
-				}
-
-				menu.showAtPosition({ x: x, y: y });
-			}
-
-			interface Folder {
-				[label: string]: Folder | TFile;
-			}
-			const folder: Folder = {};
-
-			for (const file of files) {
-				const segments = file.path.split("/");
-
-				let currFolder = folder;
-				for (const [i, segment] of segments.entries()) {
-					if (i === segments.length - 1) {
-						currFolder[segment] = file;
-					} else {
-						const nextFolder = currFolder[segment] || {};
-						if (nextFolder instanceof TFile) {
-							continue;
-						}
-						currFolder[segment] = nextFolder;
-						currFolder = nextFolder;
-					}
-				}
-			}
-
-			createMenu(folder, undefined);
+				// Delete the old task
+				await updateRowWithTask(id, (task) => task.delete());
+			});
 		},
 	};
 }
+
 
 async function updateRow(
 	vault: Vault,
