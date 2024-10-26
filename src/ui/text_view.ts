@@ -1,4 +1,4 @@
-import { Menu, TextFileView, WorkspaceLeaf } from "obsidian";
+import { HoverPopover, Menu, TextFileView, WorkspaceLeaf, type HoverParent } from "obsidian";
 import matter from "front-matter";
 
 import Main from "./main.svelte";
@@ -20,7 +20,9 @@ import {
 
 export const KANBAN_VIEW_NAME = "kanban-view";
 
-export class KanbanView extends TextFileView {
+export class KanbanView extends TextFileView implements HoverParent {
+	hoverPopover: HoverPopover | null = null;
+
 	private readonly settingsStore: Writable<SettingValues>;
 	private readonly destroySettingsStore: () => void;
 
@@ -137,6 +139,8 @@ ${parsed.body}
 				settingsStore: this.settingsStore,
 			},
 		});
+
+		this.addAction("gear", "Kanban settings", () => this.openSettingsModal());
 	}
 
 	async onClose() {
@@ -146,23 +150,14 @@ ${parsed.body}
 
 	onPaneMenu(menu: Menu, source: string): void {
 		menu.addItem((item) => {
-			item.setTitle("Open as markdown")
-				.setIcon("document")
-				.onClick(() => {
-					const leaf = this.app.workspace.getLeaf();
-					leaf.setViewState({
-						type: "markdown",
-						state: leaf.view.getState(),
-					});
-				});
-		});
-
-		menu.addItem((item) => {
 			item.setTitle("Kanban settings")
 				.setIcon("gear")
+				.setSection("pane")
 				.onClick(() => {
 					this.openSettingsModal();
 				});
 		});
+
+		super.onPaneMenu(menu, source);
 	}
 }

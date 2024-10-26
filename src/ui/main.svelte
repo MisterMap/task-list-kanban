@@ -116,11 +116,6 @@
 		display: flex;
 		flex-direction: column;
 
-		.settings {
-			display: flex;
-			justify-content: flex-end;
-		}
-
 		.columns {
 			height: 100%;
 			flex-grow: 1;
