@@ -14,7 +14,6 @@
 
 	export let tasksStore: Writable<Task[]>;
 	export let taskActions: TaskActions;
-	export let openSettings: () => Promise<void>;
 	export let columnTagTableStore: Readable<ColumnTagTable>;
 	export let settingsStore: Writable<SettingValues>;
 
@@ -75,17 +74,9 @@
 	$: tasksByColumn = groupByColumnTag(filteredByTag);
 
 	$: ({ showFilepath = true, consolidateTags = false } = $settingsStore);
-
-	async function handleOpenSettings() {
-		openSettings();
-	}
 </script>
 
 <div class="main">
-	<div class="settings">
-		<IconButton icon="lucide-settings" on:click={handleOpenSettings} />
-	</div>
-
 	<div class="columns">
 		<div>
 			<Column

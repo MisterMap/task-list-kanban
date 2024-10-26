@@ -1,4 +1,4 @@
-import { TextFileView, WorkspaceLeaf } from "obsidian";
+import { Menu, TextFileView, WorkspaceLeaf } from "obsidian";
 import matter from "front-matter";
 
 import Main from "./main.svelte";
@@ -134,7 +134,6 @@ ${parsed.body}
 				tasksStore: this.tasksStore,
 				taskActions: this.taskActions,
 				columnTagTableStore: this.columnTagTableStore,
-				openSettings: () => this.openSettingsModal(),
 				settingsStore: this.settingsStore,
 			},
 		});
@@ -143,5 +142,27 @@ ${parsed.body}
 	async onClose() {
 		this.component?.$destroy();
 		this.destroySettingsStore();
+	}
+
+	onPaneMenu(menu: Menu, source: string): void {
+		menu.addItem((item) => {
+			item.setTitle("Open as markdown")
+				.setIcon("document")
+				.onClick(() => {
+					const leaf = this.app.workspace.getLeaf();
+					leaf.setViewState({
+						type: "markdown",
+						state: leaf.view.getState(),
+					});
+				});
+		});
+
+		menu.addItem((item) => {
+			item.setTitle("Kanban settings")
+				.setIcon("gear")
+				.onClick(() => {
+					this.openSettingsModal();
+				});
+		});
 	}
 }
