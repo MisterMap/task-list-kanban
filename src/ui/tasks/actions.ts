@@ -92,7 +92,9 @@ export function createTaskActions({
 
 	function createMenuForFolder(folder: Folder, event: MouseEvent, onFileSelect: (file: TFile) => void) {
 		const target = event.target as HTMLButtonElement | undefined;
+		console.log('Event target:', target);
 		if (!target) {
+			console.warn('No target found in event');
 			return;
 		}
 
@@ -198,16 +200,26 @@ export function createTaskActions({
 		},
 
 		async changeProject(id: string, event: MouseEvent) {
+			console.log("Changing project for task:", id);
 			const task = tasksByTaskId.get(id);
-			if (!task) return;
+			if (!task) {
+				console.log("Task not found:", id);
+				return;
+			}
 			const folder = createFolderStructure();
-			createMenuForFolder(folder, event, async (file) => {
+			createMenuForFolder(folder, event, (file) => {
+				console.log("Selected new file:", file.path);
 				const newTaskString = task?.serialise();
-				if (!newTaskString) return;
-				await updateRow(vault, file, undefined, newTaskString);
+				if (!newTaskString) {
+					console.log("Failed to serialise task");
+					return;
+				}
+				console.log("Moving task to new file with content: ", newTaskString);
+				updateRow(vault, file, undefined, newTaskString);
 
 				// Delete the old task
-				await updateRowWithTask(id, (task) => task.delete());
+				console.log("Deleting task from original location");
+				updateRowWithTask(id, (task) => task.delete());
 			});
 		},
 	};
