@@ -93,14 +93,15 @@ export function createTaskActions({
 	function createMenuForFolder(folder: Folder, event: MouseEvent, onFileSelect: (file: TFile) => void) {
 		const target = event.target as HTMLButtonElement | undefined;
 		console.log('Event target:', target);
-		if (!target) {
+		let x = 0;
+		let y = 0;
+		if (target) {
+			const boundingRect = target.getBoundingClientRect();
+			y = boundingRect.top + boundingRect.height / 2;
+			x = boundingRect.left + boundingRect.width / 2;
+		} else {
 			console.warn('No target found in event');
-			return;
 		}
-
-		const boundingRect = target.getBoundingClientRect();
-		const y = boundingRect.top + boundingRect.height / 2;
-		const x = boundingRect.left + boundingRect.width / 2;
 
 		function createMenu(folderItem: Folder | TFile, parentMenu: Menu | undefined) {
 			const menu = new Menu();
@@ -201,6 +202,7 @@ export function createTaskActions({
 
 		async changeProject(id: string, event: MouseEvent) {
 			console.log("Changing project for task:", id);
+			console.log("Event: ", event);
 			const task = tasksByTaskId.get(id);
 			if (!task) {
 				console.log("Task not found:", id);
