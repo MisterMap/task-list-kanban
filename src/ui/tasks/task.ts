@@ -1,4 +1,5 @@
 import type { ColumnTag, ColumnTagTable } from "../columns/columns";
+import { DateType, extractDates, formatTaskDate, getCurrentDate } from "./date_utils";
 
 import type { Brand } from "src/brand";
 import { getTagsFromContent } from "src/parsing/tags/tags";
@@ -30,12 +31,39 @@ export class Task {
 			throw new Error("Content not found in raw content");
 		}
 
-		const tags = getTagsFromContent(content);
-
+		const { content: parsedContent, dates } = extractDates(content);
+		
 		this._id = sha256(content + fileHandle.path + rowIndex).toString();
-		this._content = content;
+		this._content = parsedContent;
 		this._done = status === "x";
 		this._path = fileHandle.path;
+
+		// Handle dates
+		for (const { type, date } of dates) {
+			switch (type) {
+				case DateType.DUE:
+					this._dueDate = date;
+					break;
+				case DateType.STATUS_CHANGED:
+					this._statusChangedDate = date;
+					break;
+				case DateType.CREATED:
+					this._createdDate = date;
+					break;
+			}
+		}
+
+		// Set default dates if not present
+		const now = getCurrentDate();
+		if (!this._createdDate) {
+			this._createdDate = now;
+		}
+		if (!this._statusChangedDate) {
+			this._statusChangedDate = now;
+		}
+
+		const tags = getTagsFromContent(this._content);
+		
 		this._priority = (() => {
 			let priority = 3;
 			for (let i = 3; i >= 0; i--) {
@@ -48,10 +76,6 @@ export class Task {
 			}
 			return priority;
 		})();
-
-		const { content: contentWithoutDate, date } = this.extractDueDate(this._content);
-		this._content = contentWithoutDate;
-		this._dueDate = date;
 
 		for (const tag of tags) {
 			if (tag in columnTagTable || tag === "done") {
@@ -71,11 +95,6 @@ export class Task {
 		}
 
 		this.tags = tags;
-		this.blockLink = blockLink;
-
-		if (this._done) {
-			this._column = undefined;
-		}
 	}
 
 	private _id: string;
@@ -106,6 +125,7 @@ export class Task {
 	set done(done: true) {
 		this._done = done;
 		this._column = undefined;
+		this._statusChangedDate = getCurrentDate();
 	}
 
 	private _deleted: boolean = false;
@@ -120,6 +140,9 @@ export class Task {
 		return this._column;
 	}
 	set column(column: ColumnTag) {
+		if (this._column !== column) {
+			this._statusChangedDate = getCurrentDate();
+		}
 		this._column = column;
 		this._done = false;
 	}
@@ -140,6 +163,16 @@ export class Task {
 		this._dueDate = value;
 	}
 
+	private _statusChangedDate: Date = getCurrentDate();
+	get statusChangedDate(): Date {
+		return this._statusChangedDate;
+	}
+
+	private _createdDate: Date = getCurrentDate();
+	get createdDate(): Date {
+		return this._createdDate;
+	}
+
 	readonly blockLink: string | undefined;
 	readonly tags: ReadonlySet<string>;
 
@@ -156,9 +189,11 @@ export class Task {
 						.map((tag) => `#${tag}`)
 						.join(" ")}`
 				: "",
-			this._dueDate ? ` ${this._dueDate.toISOString().split('T')[0]}` : "",
 			this.column ? ` #${this.column}` : "",
 			this._priority < 3 ? ` #p${this._priority}` : "",
+			this._dueDate ? ` ${formatTaskDate(DateType.DUE, this._dueDate)}` : "",
+			` ${formatTaskDate(DateType.STATUS_CHANGED, this._statusChangedDate)}`,
+			` ${formatTaskDate(DateType.CREATED, this._createdDate)}`,
 			this.blockLink ? ` ^${this.blockLink}` : "",
 		]
 			.join("")

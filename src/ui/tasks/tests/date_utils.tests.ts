@@ -1,5 +1,5 @@
 import { DateType, extractDates, formatDate, formatTaskDate, getCurrentDate } from "../date_utils";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("Date Utils", () => {
   describe("extractDates", () => {
@@ -101,13 +101,23 @@ describe("Date Utils", () => {
   });
 
   describe("getCurrentDate", () => {
+    const mockDate = new Date("2024-03-20T00:00:00.000Z");
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(mockDate);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
     it("returns current date without time", () => {
       const result = getCurrentDate();
-      const now = new Date();
       
-      expect(result.getFullYear()).toBe(now.getFullYear());
-      expect(result.getMonth()).toBe(now.getMonth());
-      expect(result.getDate()).toBe(now.getDate());
+      expect(result.getFullYear()).toBe(2024);
+      expect(result.getMonth()).toBe(2); // March is 2 (0-based)
+      expect(result.getDate()).toBe(20);
       expect(result.getHours()).toBe(0);
       expect(result.getMinutes()).toBe(0);
       expect(result.getSeconds()).toBe(0);
