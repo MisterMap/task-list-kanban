@@ -1,16 +1,19 @@
 # Active Tasks
 
 ## In Progress
-1. **Date Handling and Sorting** [tasks/date-handling]
-   - Date parsing and formatting implemented with test coverage
-   - Support for due dates, status change dates, and creation dates
-   - Status change tracking implemented
-   - Sorting functionality implemented with priority > due date > status changed
-   - Remaining: UI integration and testing
-   - Status: Implementation phase - ~70% complete
+None
 
 ## Backlog
 None
 
 ## Completed
-None
+1. **Date Handling and Sorting** [tasks/date-handling]
+   - Implemented comprehensive date handling for tasks in Kanban
+   - Features:
+     - Support for due dates, status change dates, and creation dates
+     - Automatic status change tracking
+     - Priority-based sorting with date fallbacks
+     - Color-coded due date indicators
+     - UI integration with task menu actions
+   - Full test coverage including unit and integration tests
+   - Completed: March 2024
