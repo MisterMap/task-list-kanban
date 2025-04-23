@@ -74,3 +74,49 @@ To add a tag to a task, add the text, '#[tag name]' to anywhere within your task
 
 **Filtering tasks within the kanban view**
 To filter tasks when in the kanban view, type the tag name into the filter bar at the top of the kanban. You can select as many tags as you like.Your kanban will now only display tasks that include that tag.
+
+### Development
+
+This plugin is built using TypeScript and Svelte. If you'd like to contribute to the development of Task List Kanban, follow these steps:
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd task-list-kanban
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Development workflow**
+   - Run the development server:
+     ```bash
+     npm run dev
+     ```
+   - Build the plugin:
+     ```bash
+     npm run build
+     ```
+   - Run tests:
+     ```bash
+     npm run test
+     ```
+
+4. **Creating a release**
+   - Update the version in `manifest.json`
+   - Run the release script:
+     ```bash
+     npm run release
+     ```
+
+The plugin uses several key dependencies:
+- Svelte for UI components
+- Obsidian API for integration
+- Showdown for markdown processing
+- Crypto-JS for encryption features
+
+Contributions are welcome! Please feel free to submit pull requests or open issues for any bugs or feature requests.
+
+
