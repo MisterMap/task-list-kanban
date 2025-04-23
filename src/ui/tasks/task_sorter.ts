@@ -20,7 +20,6 @@ export function compareTasks(a: Task, b: Task): number {
             return dueDateDiff;
         }
     } else if (a.dueDate) {
-        // Tasks with due dates come before tasks without
         return -1;
     } else if (b.dueDate) {
         return 1;
@@ -32,8 +31,12 @@ export function compareTasks(a: Task, b: Task): number {
         return statusDateDiff;
     }
     
-    // If status dates are equal, compare by file name
-    return a.path.localeCompare(b.path);
+    // If all else equal and tasks are from the same file, compare by row index
+    if (a.path !== b.path) {
+        return a.path.localeCompare(b.path);
+    }
+    // If status dates are equal, compare by row index
+    return a.rowIndex - b.rowIndex;
 }
 
 /**

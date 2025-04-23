@@ -10,11 +10,22 @@ Task List Kanban is built as an Obsidian plugin using TypeScript and Svelte, fol
   - Scans Obsidian files for task markers
   - Extracts task content and metadata
   - Parses tags and column assignments
+  - Processes date-related metadata
+    - Due dates from task content
+    - Status change tracking
+    - Date format standardization
 
 - **Task Synchronizer**
   - Maintains bidirectional sync between Kanban and files
   - Handles task updates and state changes
   - Manages file modifications
+  - Ensures date consistency across updates
+
+- **Task Sorter**
+  - Implements multi-level sorting strategy
+  - Handles priority-based ordering
+  - Processes date-based comparisons
+  - Maintains consistent task order
 
 ### 2. Kanban View System
 - **Board Manager**

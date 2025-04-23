@@ -8,6 +8,7 @@
 	} from "../columns/columns";
 	import type { TaskActions } from "../tasks/actions";
 	import type { Task } from "../tasks/task";
+	import { sortTasks } from "../tasks/task_sorter";
 	import TaskComponent from "./task.svelte";
 	import IconButton from "./icon_button.svelte";
 	import { isDraggingStore } from "../dnd/store";
@@ -37,20 +38,7 @@
 
 	$: columnTitle = getColumnTitle(column, $columnTagTableStore);
 
-	function sortTasks(a: Task, b: Task) {
-		if (a.priority !== b.priority) {
-			return a.priority - b.priority; // Sort by priority descending
-		}
-		if (a.dueDate && b.dueDate) {
-			return a.dueDate.getTime() - b.dueDate.getTime(); // Sort by due date ascending
-		}
-		if (a.path === b.path) {
-			return a.rowIndex - b.rowIndex; // Sort by rowIndex if paths are the same
-		}
-		return a.path.localeCompare(b.path); // Sort by path
-	}
-
-	$: sortedTasks = tasks.sort(sortTasks);
+	$: sortedTasks = sortTasks([...tasks]);
 
 	function showMenu(e: MouseEvent) {
 		const menu = new Menu();

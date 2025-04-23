@@ -128,4 +128,30 @@ npm run build
 3. Debounced operations
 4. Cached computations
 
+## Task Date Handling
+
+### Date Types
+- **Due Date**: Optional task deadline
+- **Status Changed Date**: Tracks last task state modification
+
+### Date Processing
+- Dates are stored as JavaScript Date objects
+- UTC timezone handling for consistency
+- ISO 8601 format for storage
+
+### Task Sorting Algorithm
+1. Priority-based sorting (lower number = higher priority)
+2. Due date comparison
+   - Tasks with due dates precede those without
+   - Chronological ordering for tasks with due dates
+3. Status changed date as secondary sort criterion
+4. File location as final tiebreaker
+   - Same file: Sort by row index
+   - Different files: Sort by file path
+
+### Date Display
+- Localized date formatting
+- Relative time display where appropriate
+- Timezone-aware rendering
+
 
