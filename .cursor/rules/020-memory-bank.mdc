@@ -18,11 +18,9 @@ flowchart TD
     PB --> AR[ [architecture.md](mdc:docs/architecture.md) ]
 
 
-    subgraph TASKS[ @tasks/<task-name> ]
-        AR --> TC[ [tasks_plan.md](mdc:tasks/<task-name>/tasks_plan.md) ]
+    subgraph TASKS[ @tasks ]
+        AR --> TC[ [<task-name>.md](mdc:tasks/<task-name>.md) ]
         PB --> TC
-        
-        TC --> AC[ [active_context.md](mdc:tasks/<task-name>/active_context.md) ]
     end
     
     PB --o TASKS
@@ -54,22 +52,17 @@ flowchart TD
   - Design patterns in use
   - Technical constraints
 
-   4. [tasks_plan.md](mdc:tasks/<task-name>/tasks_plan.md) (tasks/<task-name>/tasks_plan.md): Detailed Task backlog
-  - Requirenments
-  - In-Depth Task description
-  - Implementation Plan
-  - Design description
-  - Known issues
-  - Must be updated when starting or completing a task
-  
-  5. [active_context.md](mdc:tasks/<task-name>/active_context.md) (tasks/<task-name>/active_context.md): Current state of development
-  - Current work focus
+   4. [<task-name>.md](mdc:tasks/<task-name>.md) (tasks/<task-name>.md): Task documentation
+  - Requirements and objectives
+  - Implementation plan
+  - Current status and progress
   - Active decisions and considerations
   - Recent changes
   - Next steps
+  - Known issues
   - Must be updated when starting or completing a task
 
-  6. [tasks.md](mdc:tasks/tasks.md) (tasks/tasks.md): Overview of active tasks
+  5. [tasks.md](mdc:tasks/tasks.md) (tasks/tasks.md): Overview of active tasks
   - Brief description of each active task in on line for each task
   - Current status summary
   - Links to task directories
@@ -86,11 +79,11 @@ Create additional files or folders as Memory files in docs/ or tasks/ when they 
 If user proves path to current task inside `tasks/` directory use it.
 Otherwise ask user about current task to work on.
 If users asks to start new task then:
-1. Create new directory and initialize it with `tasks_plan.md` and `active_context.md` files
+1. Create new task file `tasks/<task-name>.md`
 2. Update `tasks/tasks.md` to include the new task with:
    - Objective (brief description)
    - Current status (initial steps)
-   - Directory link
+   - File link
 
 # Core Workflows
 Now we define the procedural workflows to read/write to these memeory files in different modes.
@@ -142,8 +135,8 @@ flowchart TD
     
     subgraph Process
         P1[Review Core Files]
-        P2[Document Current State in [active_context.md](mdc:tasks/<task-name>/active_context.md) and [tasks_plan.md](mdc:tasks/<task-name>/tasks_plan.md) ]
-        P3[Clarify Next Steps and document in [tasks_plan.md](mdc:tasks/<task-name>/tasks_plan.md) ]
+        P2[Document Current State in [<task-name>.md](mdc:tasks/<task-name>.md) ]
+        P3[Clarify Next Steps and document in [<task-name>.md](mdc:tasks/<task-name>.md) ]
         P4[Update [tasks.md](mdc:tasks/tasks.md) with current task status]
         
         P1 --> P2 --> P3 --> P4
@@ -152,20 +145,20 @@ flowchart TD
     Start --> Process
 ```
 
-Note: When triggered by **update memory files**, I MUST review every Core memory file, even if some don't require updates. Focus particularly on [active_context.md](mdc:tasks/<task-name>/active_context.md), [tasks_plan.md](mdc:tasks/<task-name>/tasks_plan.md), and [tasks.md](mdc:tasks/tasks.md) as they track current state.
+Note: When triggered by **update memory files**, I MUST review every Core memory file, even if some don't require updates. Focus particularly on [<task-name>.md](mdc:tasks/<task-name>.md) and [tasks.md](mdc:tasks/tasks.md) as they track current state.
 
 ## Task Lifecycle Documentation
 
 When a new task is started:
-1. Create task directory structure with required files
+1. Create new task file
 2. Update `tasks/tasks.md` to include the new task
 
 When task status changes:
-1. Update the task-specific files with progress details
+1. Update the task file with progress details
 2. Update `tasks/tasks.md` with the new status summary
 
 When a task is completed:
-1. Update task-specific files with completion details
+1. Update task file with completion details
 2. Update `tasks/tasks.md` to move the task to a completed section
 
 # Project Intelligence (.cursor/rules)

@@ -105,40 +105,38 @@ export function createTaskActions({
 
 		function createMenu(folderItem: Folder | TFile, parentMenu: Menu | undefined) {
 			const menu = new Menu();
-			menu.addItem((i) => {
-				i.setTitle(parentMenu ? `← back` : "Choose a file")
-					.setDisabled(!parentMenu)
-					.onClick(() => {
-						parentMenu?.showAtPosition({ x, y });
-					});
-			});
-	
 			const { match_pattern, no_match_pattern } = get(settingsStore);
-			for (const [label, item] of Object.entries(folderItem)) {
-				if (match_pattern && !label.match(match_pattern)) {
-					continue;
+
+			// Collect all files first
+			const allFiles: TFile[] = [];
+			function collectFiles(folderItem: Folder | TFile) {
+				if (folderItem instanceof TFile) {
+					if (match_pattern && !folderItem.name.match(match_pattern)) return;
+					if (no_match_pattern && folderItem.name.match(no_match_pattern)) return;
+					allFiles.push(folderItem);
+					return;
 				}
-				if (no_match_pattern && label.match(no_match_pattern)) {
-					continue;
+				for (const item of Object.values(folderItem)) {
+					collectFiles(item);
 				}
+			}
+			collectFiles(folderItem);
+
+			// Sort all files by name
+			allFiles.sort((a, b) => a.name.localeCompare(b.name));
+
+			// Add sorted files to menu
+			for (const file of allFiles) {
 				menu.addItem((i) => {
-					i.setTitle(item instanceof TFile ? label : label + " →")
-						.onClick(() => {
-							if (item instanceof TFile) {
-								onFileSelect(item);
-							} else {
-								createMenu(item, menu);
-							}
-						});
+					i.setTitle(file.name)
+						.onClick(() => onFileSelect(file));
 				});
 			}
-	
+
 			menu.showAtPosition({ x, y });
 		}
-	
 		createMenu(folder, undefined);
 	}
-	
 
 	return {
 		async changeColumn(id, column) {

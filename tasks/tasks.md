@@ -1,7 +1,13 @@
 # Active Tasks
 
 ## In Progress
-None
+2. **Project Name Display Enhancement** [tasks/project-name-display]
+   - Change project name display in board from full path to file path only
+   - Features:
+     - Extract and display only the file name from full path
+     - Maintain full path in data structure for reference
+     - Update UI components to reflect new display format
+   - Status: In Progress
 
 ## Backlog
 None

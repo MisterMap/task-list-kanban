@@ -135,6 +135,10 @@ export class Task {
 		return this._path;
 	}
 
+	get fileName() {
+		return this._path.split('/').pop() || this._path;
+	}
+
 	private _column: ColumnTag | "archived" | undefined;
 	get column(): ColumnTag | "archived" | undefined {
 		return this._column;

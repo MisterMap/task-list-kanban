@@ -1,0 +1,79 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Task Commands
+
+This rule defines how to handle special commands related to task management.
+
+## Command: /start_new_task
+
+When the user types `/start_new_task`, the following workflow should be triggered:
+
+1. Prompt the user for:
+   - Task name (will be used to create the task file)
+   - Brief objective/description of the task
+
+2. Create a new task file at `tasks/<task-name>.md` with the following template:
+```markdown
+# <Task Name>
+
+## Objective
+<Brief description provided by user>
+
+## Implementation Plan
+1. 
+
+## Current Status
+- Status: [Not Started/In Progress/Completed]
+- Completed steps
+- The next step
+- Recent changes
+- Progress: [X% complete or specific milestones achieved]
+- Last Updated: [Date]
+
+## Recent Changes
+- Created task file
+
+## Known Issues
+- None yet
+
+## Notes
+- Task created on <current date>
+```
+
+3. Update `tasks/tasks.md` to include the new task with:
+   - Task name
+   - Brief objective
+   - Current status (Initial setup)
+   - Link to the task file
+
+4. Confirm to the user that:
+   - New task file has been created
+   - Tasks overview has been updated
+   - Provide the path to the new task file
+
+## Usage Example
+
+User: `/start_new_task`
+
+Assistant: I'll help you create a new task. Please provide:
+1. Task name (this will be used for the file name)
+2. Brief description of what this task aims to accomplish
+
+User: Task name: implement-kanban-view
+Description: Add a Kanban board view for task lists
+
+Assistant: I'll create a new task file for implementing the Kanban view...
+
+[Proceeds with creating the task file and updating tasks.md]
+
+
+
+
+
+
+
+
+

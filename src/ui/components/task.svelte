@@ -165,7 +165,7 @@
 	</div>
 	{#if showFilepath}
 		<div class="task-footer">
-			<p>{task.path}</p>
+			<p title={task.path}>{task.fileName}</p>
 		</div>
 	{/if}
 	{#if shouldconsolidateTags}
