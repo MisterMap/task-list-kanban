@@ -84,6 +84,23 @@ export class SettingsModal extends Modal {
 				});
 			});
 
+		new Setting(this.contentEl)
+			.setName("Sort Order")
+			.setDesc('Comma-separated list of sort criteria (e.g., "priority, dueDate, statusChanged"). Available: priority, dueDate, statusChanged, created, path, rowIndex')
+			.addText((text) => {
+				const sortOrder = this.settings.sortOrder ?? ["priority"];
+				text.setValue(sortOrder.join(", "));
+				text.onChange((value) => {
+					this.settings.sortOrder = (value.split(",")
+						.map(s => s.trim())
+						.filter(s => ["priority", "dueDate", "statusChanged", "created", "path", "rowIndex"].includes(s))) as Array<"priority" | "dueDate" | "statusChanged" | "created" | "path" | "rowIndex">;
+					// Ensure at least one sort order
+					if (this.settings.sortOrder.length === 0) {
+						this.settings.sortOrder = ["priority"];
+					}
+				});
+			});
+
 		new Setting(this.contentEl).addButton((btn) =>
 			btn.setButtonText("Save").onClick(() => {
 				this.close();

@@ -60,8 +60,8 @@ describe("Task Sorter", () => {
             const highPriority = createMockTask({ priority: 0 });
             const lowPriority = createMockTask({ priority: 3 });
             
-            expect(compareTasks(highPriority, lowPriority)).toBeLessThan(0);
-            expect(compareTasks(lowPriority, highPriority)).toBeGreaterThan(0);
+            expect(compareTasks(highPriority, lowPriority, ["priority"])).toBeLessThan(0);
+            expect(compareTasks(lowPriority, highPriority, ["priority"])).toBeGreaterThan(0);
         });
 
         it("should sort by due date when priorities are equal", () => {
@@ -74,8 +74,8 @@ describe("Task Sorter", () => {
                 dueDate: new Date("2024-03-02")
             });
             
-            expect(compareTasks(earlier, later)).toBeLessThan(0);
-            expect(compareTasks(later, earlier)).toBeGreaterThan(0);
+            expect(compareTasks(earlier, later, ["priority", "dueDate"])).toBeLessThan(0);
+            expect(compareTasks(later, earlier, ["priority", "dueDate"])).toBeGreaterThan(0);
         });
 
         it("should place tasks with due dates before tasks without", () => {
@@ -88,8 +88,8 @@ describe("Task Sorter", () => {
                 dueDate: null
             });
             
-            expect(compareTasks(withDueDate, withoutDueDate)).toBeLessThan(0);
-            expect(compareTasks(withoutDueDate, withDueDate)).toBeGreaterThan(0);
+            expect(compareTasks(withDueDate, withoutDueDate, ["priority", "dueDate"])).toBeLessThan(0);
+            expect(compareTasks(withoutDueDate, withDueDate, ["priority", "dueDate"])).toBeGreaterThan(0);
         });
 
         it("should sort by status changed date when other criteria are equal", () => {
@@ -102,8 +102,8 @@ describe("Task Sorter", () => {
                 statusChangedDate: new Date("2024-03-02")
             });
             
-            expect(compareTasks(earlierStatus, laterStatus)).toBeLessThan(0);
-            expect(compareTasks(laterStatus, earlierStatus)).toBeGreaterThan(0);
+            expect(compareTasks(earlierStatus, laterStatus, ["priority", "statusChanged"])).toBeLessThan(0);
+            expect(compareTasks(laterStatus, earlierStatus, ["priority", "statusChanged"])).toBeGreaterThan(0);
         });
 
         it("should handle equal tasks correctly", () => {
@@ -119,7 +119,7 @@ describe("Task Sorter", () => {
                 statusChangedDate: date
             });
             
-            expect(compareTasks(task1, task2)).toBe(0);
+            expect(compareTasks(task1, task2, ["priority", "dueDate", "statusChanged"])).toBe(0);
         });
     });
 
@@ -131,7 +131,7 @@ describe("Task Sorter", () => {
                 createMockTask({ priority: 1, dueDate: new Date("2024-03-01") })
             ];
 
-            const sorted = sortTasks(tasks);
+            const sorted = sortTasks(tasks, ["priority"]);
             
             expect(sorted[0]!.priority).toBe(0);
             expect(sorted[1]!.priority).toBe(1);
@@ -140,7 +140,7 @@ describe("Task Sorter", () => {
 
         it("should handle empty array", () => {
             const tasks: Task[] = [];
-            expect(sortTasks(tasks)).toEqual([]);
+            expect(sortTasks(tasks, ["priority"])).toEqual([]);
         });
 
         it("should maintain relative order for equal priority tasks", () => {
@@ -154,7 +154,7 @@ describe("Task Sorter", () => {
                 createMockTask({ priority: 1, dueDate: date2 })
             ];
 
-            const sorted = sortTasks(tasks);
+            const sorted = sortTasks(tasks, ["priority", "dueDate"]);
             
             expect(sorted[0]!.dueDate).toEqual(date1);
             expect(sorted[1]!.dueDate).toEqual(date2);
@@ -167,7 +167,7 @@ describe("Task Sorter", () => {
                 createMockTask({ priority: 1 })
             ];
 
-            const sorted = sortTasks(tasks);
+            const sorted = sortTasks(tasks, ["priority", "statusChanged"]);
             expect(sorted).toHaveLength(2);
             // Both tasks should have the same statusChangedDate from mock
             expect(sorted[0]!.statusChangedDate.getTime()).toBe(sorted[1]!.statusChangedDate.getTime());

@@ -8,7 +8,7 @@
 	} from "../columns/columns";
 	import type { TaskActions } from "../tasks/actions";
 	import type { Task } from "../tasks/task";
-	import { sortTasks } from "../tasks/task_sorter";
+	import { sortTasks, type SortOrder } from "../tasks/task_sorter";
 	import TaskComponent from "./task.svelte";
 	import IconButton from "./icon_button.svelte";
 	import { isDraggingStore } from "../dnd/store";
@@ -21,6 +21,7 @@
 	export let columnTagTableStore: Readable<ColumnTagTable>;
 	export let showFilepath: boolean;
 	export let consolidateTags: boolean;
+	export let sortOrder: SortOrder[] = ["priority"];
 
 	function getColumnTitle(
 		column: ColumnTag | DefaultColumns,
@@ -38,7 +39,7 @@
 
 	$: columnTitle = getColumnTitle(column, $columnTagTableStore);
 
-	$: sortedTasks = sortTasks([...tasks]);
+	$: sortedTasks = sortTasks([...tasks], sortOrder);
 
 	function showMenu(e: MouseEvent) {
 		const menu = new Menu();

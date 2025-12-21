@@ -10,6 +10,14 @@ const settingsObject = z.object({
 	consolidateTags: z.boolean().default(false).optional(),
 	match_pattern: z.string().optional(),
 	no_match_pattern: z.string().optional(),
+	sortOrder: z.array(z.union([
+		z.literal("priority"),
+		z.literal("dueDate"),
+		z.literal("statusChanged"),
+		z.literal("created"),
+		z.literal("path"),
+		z.literal("rowIndex"),
+	])).default(["priority"]).optional(),
 });
 
 export type SettingValues = z.infer<typeof settingsObject>;
@@ -21,6 +29,7 @@ const defaultSettings: SettingValues = {
 	consolidateTags: false,
 	match_pattern: '',
 	no_match_pattern: '',
+	sortOrder: ["priority"],
 };
 
 export const createSettingsStore = () =>
@@ -28,9 +37,13 @@ export const createSettingsStore = () =>
 
 export function parseSettingsString(str: string): SettingValues {
 	try {
-		return (
-			settingsObject.safeParse(JSON.parse(str)).data ?? defaultSettings
-		);
+		const parsed = JSON.parse(str);
+		// Migrate old string sortOrder to array format
+		if (parsed.sortOrder && typeof parsed.sortOrder === "string") {
+			parsed.sortOrder = [parsed.sortOrder];
+		}
+		const result = settingsObject.safeParse(parsed);
+		return result.data ?? defaultSettings;
 	} catch {
 		return defaultSettings;
 	}
