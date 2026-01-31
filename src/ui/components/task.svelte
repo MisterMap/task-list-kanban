@@ -61,6 +61,7 @@
 	}
 
 	let textAreaEl: HTMLTextAreaElement | undefined;
+	let mdContent: string;
 
 	function handleFocus(e?: MouseEvent) {
 		const target = (e?.target || e?.currentTarget) as
@@ -77,9 +78,11 @@
 		}, 100);
 	}
 
-	$: mdContent = mdConverted.makeHtml(
-		task.content + (task.blockLink ? ` ^${task.blockLink}` : ""),
-	);
+	$: {
+		mdContent = mdConverted.makeHtml(
+			task.content + (task.blockLink ? ` ^${task.blockLink}` : ""),
+		);
+	}
 
 	$: {
 		if (textAreaEl) {
@@ -127,6 +130,21 @@
 			return 'var(--color-p2)'; // due in the future
 		}
 	}
+
+	function getDueDateHighlightColor(dueDate: Date): string {
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+		const tomorrow = new Date(today);
+		tomorrow.setDate(tomorrow.getDate() + 1);
+
+		if (dueDate < today) {
+			return 'var(--color-p0)'; // past due - red
+		} else if (dueDate < tomorrow) {
+			return 'var(--color-p1)'; // due today - orange
+		} else {
+			return 'var(--color-p2)'; // due in the future - blue
+		}
+	}
 </script>
 
 <div
@@ -158,6 +176,21 @@
 					tabindex="0"
 				>
 					{@html mdContent}
+					{#if shouldconsolidateTags}
+						<div class="task-meta-line">
+							{#if task.dueDate}
+								<span 
+									class="due-date-text"
+									style="border-bottom-color: {getDueDateHighlightColor(task.dueDate)};"
+								>
+									{task.dueDate.toISOString().split('T')[0]}
+								</span>
+							{/if}
+							{#each task.tags as tag}
+								<span class="tag-text">#{tag}</span>
+							{/each}
+						</div>
+					{/if}
 				</div>
 			{/if}
 		</div>
@@ -166,31 +199,6 @@
 	{#if showFilepath}
 		<div class="task-footer">
 			<p title={task.path}>{task.fileName}</p>
-		</div>
-	{/if}
-	{#if shouldconsolidateTags}
-		<div class="task-tags">
-			{#each task.tags as tag}
-				<span>
-					<!-- prettier-ignore -->
-					<span class="cm-formatting cm-formatting-hashtag cm-hashtag cm-hashtag-begin cm-list-1">#</span><span
-						class="cm-hashtag cm-hashtag-end cm-list-1">{tag}</span
-					>
-				</span>
-			{/each}
-			{#if task.dueDate}
-				<span>
-					<span
-						class="due-date"
-						style="background-color: var(--background-primary);
-						       border-color: {getDueDateBackgroundColor(task.dueDate)};
-						       border-width: 1.5px;
-						       border-style: solid;
-						       color: var(--text-normal);">
-						{task.dueDate.toISOString().split('T')[0]}
-					</span>
-				</span>
-			{/if}
 		</div>
 	{/if}
 </div>
@@ -234,6 +242,26 @@
 							var(--background-modifier-border-focus);
 					}
 				}
+
+				.task-meta-line {
+					margin-top: var(--size-4-1);
+					display: flex;
+					flex-wrap: wrap;
+					gap: var(--size-4-1) var(--size-2-1);
+					align-items: center;
+
+					.due-date-text {
+						font-size: var(--font-ui-small);
+						color: black;
+						border-bottom: 1px solid;
+						padding-bottom: 1px;
+					}
+
+					.tag-text {
+						display: inline;
+						color: var(--text-accent);
+					}
+				}
 			}
 		}
 
@@ -247,20 +275,6 @@
 			}
 		}
 
-		.task-tags {
-			display: flex;
-			flex-wrap: wrap;
-			gap: var(--size-4-1) var(--size-2-1);
-			padding: var(--size-4-2) var(--size-2-2);
-			padding-top: 0;
-		}
-
-		.due-date {
-			padding: 0.2em 0.4em;
-			border-radius: 12px;
-			font-size: var(--font-ui-small);
-			color: var(--text-accent);
-		}
 	}
 
 	:global(.task-content *) {
