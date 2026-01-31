@@ -115,12 +115,12 @@ describe("Date Utils", () => {
     it("returns current date without time", () => {
       const result = getCurrentDate();
       
-      expect(result.getFullYear()).toBe(2024);
-      expect(result.getMonth()).toBe(2); // March is 2 (0-based)
-      expect(result.getDate()).toBe(20);
-      expect(result.getHours()).toBe(0);
-      expect(result.getMinutes()).toBe(0);
-      expect(result.getSeconds()).toBe(0);
+      expect(result.getUTCFullYear()).toBe(2024);
+      expect(result.getUTCMonth()).toBe(2); // March is 2 (0-based)
+      expect(result.getUTCDate()).toBe(20);
+      expect(result.getUTCHours()).toBe(0);
+      expect(result.getUTCMinutes()).toBe(0);
+      expect(result.getUTCSeconds()).toBe(0);
       expect(result.getMilliseconds()).toBe(0);
     });
   });

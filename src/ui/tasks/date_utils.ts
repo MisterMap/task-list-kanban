@@ -41,5 +41,5 @@ export function formatTaskDate(type: DateType, date: Date): string {
 
 export function getCurrentDate(): Date {
   const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, -now.getTimezoneOffset());
 } 

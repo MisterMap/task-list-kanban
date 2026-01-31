@@ -6,6 +6,7 @@
 	import TaskMenu from "./task_menu.svelte";
 	import { Converter } from "showdown";
 	import type { Readable } from "svelte/store";
+	import { formatDate } from "../tasks/date_utils";
 
 	export let task: Task;
 	export let taskActions: TaskActions;
@@ -19,6 +20,22 @@
 		openLinksInNewWindow: true,
 		emoji: true,
 	});
+
+	function getEditableContent(task: Task): string {
+		let editable = task.content.replaceAll("<br />", "\n");
+		
+		// Add tags
+		if (task.tags.size > 0) {
+			editable += " " + Array.from(task.tags).map(tag => `#${tag}`).join(" ");
+		}
+		
+		// Add due date
+		if (task.dueDate) {
+			editable += " " + formatDate(task.dueDate);
+		}
+		
+		return editable;
+	}
 
 	function handleContentBlur() {
 		isEditing = false;
@@ -155,7 +172,7 @@
 						on:keypress={handleKeypress}
 						on:blur={handleContentBlur}
 						on:input={onInput}
-						value={task.content.replaceAll("<br />", "\n")}
+						value={getEditableContent(task)}
 					/>
 			{:else}
 				<div
@@ -181,7 +198,7 @@
 			{#if task.dueDate}
 				<span>
 					<span class="footer-text" style="background-color: {getDueDateColor(task.dueDate)};">
-						{task.dueDate.toISOString().split('T')[0]}
+						{formatDate(task.dueDate)}
 					</span>
 				</span>
 			{/if}

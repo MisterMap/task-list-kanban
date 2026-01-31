@@ -83,18 +83,11 @@ export class Task {
 					this._column = tag as ColumnTag;
 				}
 				tags.delete(tag);
-				if (!consolidateTags) {
-					this._content = this._content
-						.replaceAll(`#${tag}`, "")
-						.trim();
-				}
 			}
-			if (consolidateTags) {
-				this._content = this._content.replaceAll(`#${tag}`, "").trim();
-			}
+			this._content = this._content.replaceAll(`#${tag}`, "").trim();
 		}
 
-		this.tags = tags;
+		this._tags = tags;
 	}
 
 	private _id: string;
@@ -113,8 +106,13 @@ export class Task {
 			this._priority = parseInt(priorityMatch[1]);
 			value = value.replace(/#p[0-3]/, '').trim();
 		}
-		const { content: contentWithoutDate, date } = this.extractDueDate(value);
-		this._content = contentWithoutDate;
+		const { content: resultContent, date } = this.extractDueDate(value);
+		const tags = getTagsFromContent(resultContent);
+		for (const tag of tags) {
+			this._content = this._content.replaceAll(`#${tag}`, "").trim();
+		}
+		this._tags = tags;
+		this._content = resultContent;
 		this._dueDate = date ?? this._dueDate;
 	}
 
@@ -179,7 +177,11 @@ export class Task {
 	}
 
 	readonly blockLink: string | undefined;
-	readonly tags: ReadonlySet<string>;
+	private _tags: Set<string>;
+
+	get tags(): ReadonlySet<string> {
+		return this._tags;
+	}
 
 	serialise(): string {
 		if (this._deleted) {
@@ -189,8 +191,8 @@ export class Task {
 		return [
 			`- [${this.done ? "x" : " "}] `,
 			this.content.trim(),
-			this.consolidateTags && this.tags.size > 0
-				? ` ${Array.from(this.tags)
+			this.consolidateTags && this._tags.size > 0
+				? ` ${Array.from(this._tags)
 						.map((tag) => `#${tag}`)
 						.join(" ")}`
 				: "",
