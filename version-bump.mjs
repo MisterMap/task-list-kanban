@@ -1,7 +1,19 @@
 import { readFileSync, writeFileSync } from "fs";
 
-const targetVersion = process.env.npm_package_version;
-console.log(`Target version: ${targetVersion}`);
+// Read current version from package.json
+let packageJson = JSON.parse(readFileSync("package.json", "utf8"));
+const currentVersion = packageJson.version;
+
+// Parse version and bump patch version (last digit)
+const versionParts = currentVersion.split(".").map(Number);
+versionParts[2] = (versionParts[2] || 0) + 1; // Increment patch version
+const targetVersion = versionParts.join(".");
+
+console.log(`Bumping version: ${currentVersion} -> ${targetVersion}`);
+
+// Update package.json with new version
+packageJson.version = targetVersion;
+writeFileSync("package.json", JSON.stringify(packageJson, null, "\t"));
 
 // read minAppVersion from manifest.json and bump version to target version
 let manifest = JSON.parse(readFileSync("manifest.json", "utf8"));
