@@ -1,5 +1,5 @@
-import { readFileSync } from "fs";
 import { execSync } from "child_process";
+import { readFileSync } from "fs";
 
 // Read the updated version from package.json
 const packageJson = JSON.parse(readFileSync("package.json", "utf8"));
