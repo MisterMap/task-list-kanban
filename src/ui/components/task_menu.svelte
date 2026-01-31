@@ -10,6 +10,7 @@
 	export let taskActions: TaskActions;
 	export let columnTagTableStore: Readable<ColumnTagTable>;
 	export let menuColor: string = "var(--color-base-50)";
+	import { getCurrentDate } from "../tasks/date_utils";
 
 	function showMenu(e: MouseEvent) {
 		const menu = new Menu();
@@ -68,14 +69,14 @@
 
 		menu.addItem((i) => {
 			i.setTitle("Today").onClick(() => {
-				const today = new Date();
+				const today = getCurrentDate();
 				taskActions.updateDueDate(task.id, today);
 			});
 		});
 
 		menu.addItem((i) => {
 			i.setTitle("Tomorrow").onClick(() => {
-				const tomorrow = new Date();
+				const tomorrow = getCurrentDate();
 				tomorrow.setDate(tomorrow.getDate() + 1);
 				taskActions.updateDueDate(task.id, tomorrow);
 			});
