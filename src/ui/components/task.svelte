@@ -99,7 +99,6 @@
 	$: shouldconsolidateTags = consolidateTags && (task.tags.size > 0 || task.dueDate);
 
 	$: priorityColor = getPriorityColor(task.priority);
-	$: borderWidth = getBorderWidth(task.priority);
 
 	const priorityColors = {
 		0: 'var(--color-p0)',
@@ -110,25 +109,6 @@
 
 	function getPriorityColor(priority: number): string {
 		return priorityColors[priority as keyof typeof priorityColors] || priorityColors.default;
-	}
-
-	function getBorderWidth(priority: number): string {
-		return priority >= 0 && priority <= 2 ? '1.5px' : 'var(--border-width)';
-	}
-
-	function getDueDateBackgroundColor(dueDate: Date): string {
-		const today = new Date();
-		today.setHours(0, 0, 0, 0);
-		const tomorrow = new Date(today);
-		tomorrow.setDate(tomorrow.getDate() + 1);
-
-		if (dueDate < today) {
-			return 'var(--color-p0)'; // past due
-		} else if (dueDate < tomorrow) {
-			return 'var(--color-p1)'; // due today
-		} else {
-			return 'var(--color-p2)'; // due in the future
-		}
 	}
 
 	function getDueDateHighlightColor(dueDate: Date): string {
@@ -142,7 +122,7 @@
 		} else if (dueDate < tomorrow) {
 			return 'var(--color-p1)'; // due today - orange
 		} else {
-			return 'var(--color-p2)'; // due in the future - blue
+			return 'white'; // due in the future - blue
 		}
 	}
 </script>
@@ -154,7 +134,7 @@
 	draggable={!isEditing}
 	on:dragstart={handleDragStart}
 	on:dragend={handleDragEnd}
-	style="border: {borderWidth} solid {priorityColor};"
+	style="border: var(--border-width) solid {priorityColor};"
 >
 	<div class="task-body">
 		<div class="task-content">
@@ -205,6 +185,7 @@
 
 <style lang="scss">
 	.task {
+		--border-width: 1.5px;
 		background-color: white;
 		border-radius: var(--radius-m);
 		border: var(--border-width) solid var(--background-modifier-border);
@@ -217,7 +198,6 @@
 		.task-body {
 			padding: var(--size-4-2);
 			display: grid;
-			// gap: var(--size-4-2);
 			grid-template-columns: 1fr auto;
 
 			p {
@@ -253,13 +233,17 @@
 					.due-date-text {
 						font-size: var(--font-ui-small);
 						color: black;
-						border-bottom: 1px solid;
-						padding-bottom: 1px;
+						border-bottom: var(--border-width) solid;
+						padding-bottom: var(--size-1-1);
 					}
 
 					.tag-text {
+						font-size: var(--font-ui-small);
 						display: inline;
-						color: var(--text-accent);
+						color: black;
+						border-bottom: var(--border-width) solid;
+						border-bottom-color: white;
+						padding-bottom: var(--size-1-1);
 					}
 				}
 			}
