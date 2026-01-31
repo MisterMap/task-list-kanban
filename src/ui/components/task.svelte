@@ -117,13 +117,17 @@
 		today.setHours(0, 0, 0, 0);
 		const tomorrow = new Date(today);
 		tomorrow.setDate(tomorrow.getDate() + 1);
+		const next7days = new Date(today);
+		next7days.setDate(next7days.getDate() + 7);
 
 		if (dueDate < today) {
 			return 'var(--color-p0-background)'; // past due - red
 		} else if (dueDate < tomorrow) {
-			return 'var(--color-p2-background)'; // due today - orange
+			return 'var(--color-p1-background)'; // due today - orange
+		} else if (dueDate < next7days) {
+			return 'var(--color-p2-background)'; // due in the future - blue
 		} else {
-			return 'var(--color-p3-background)'; // due in the future - blue
+			return 'var(--color-p3-background)'; // due more than 7 days from now - grey
 		}
 	}
 
