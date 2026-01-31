@@ -12,6 +12,7 @@
 	export let columnTagTableStore: Readable<ColumnTagTable>;
 	export let showFilepath: boolean;
 	export let consolidateTags: boolean;
+	import sha256 from "crypto-js/sha256";
 
 	const mdConverted = new Converter({
 		simplifiedAutoLink: true,
@@ -104,26 +105,31 @@
 		0: 'var(--color-p0)',
 		1: 'var(--color-p1)',
 		2: 'var(--color-p2)',
-		default: 'var(--background-modifier-border)'
+		default: 'var(--color-p3)'
 	};
 
 	function getPriorityColor(priority: number): string {
 		return priorityColors[priority as keyof typeof priorityColors] || priorityColors.default;
 	}
 
-	function getDueDateHighlightColor(dueDate: Date): string {
+	function getDueDateColor(dueDate: Date): string {
 		const today = new Date();
 		today.setHours(0, 0, 0, 0);
 		const tomorrow = new Date(today);
 		tomorrow.setDate(tomorrow.getDate() + 1);
 
 		if (dueDate < today) {
-			return 'var(--color-p0)'; // past due - red
+			return 'var(--color-p0-background)'; // past due - red
 		} else if (dueDate < tomorrow) {
-			return 'var(--color-p1)'; // due today - orange
+			return 'var(--color-p2-background)'; // due today - orange
 		} else {
-			return 'white'; // due in the future - blue
+			return 'var(--color-p3-background)'; // due in the future - blue
 		}
+	}
+
+	function getTagColor(tag: string): string {
+		const tagIndex = parseInt(sha256(tag).toString().slice(0, 8), 16) % 8 + 1;
+		return `var(--color-tag${tagIndex}-background)`;
 	}
 </script>
 
@@ -156,21 +162,6 @@
 					tabindex="0"
 				>
 					{@html mdContent}
-					{#if shouldconsolidateTags}
-						<div class="task-meta-line">
-							{#if task.dueDate}
-								<span 
-									class="due-date-text"
-									style="border-bottom-color: {getDueDateHighlightColor(task.dueDate)};"
-								>
-									{task.dueDate.toISOString().split('T')[0]}
-								</span>
-							{/if}
-							{#each task.tags as tag}
-								<span class="tag-text">#{tag}</span>
-							{/each}
-						</div>
-					{/if}
 				</div>
 			{/if}
 		</div>
@@ -179,6 +170,25 @@
 	{#if showFilepath}
 		<div class="task-footer">
 			<p title={task.path}>{task.fileName}</p>
+		</div>
+	{/if}
+	{#if shouldconsolidateTags}
+		<div class="task-tags">
+			{#if task.dueDate}
+				<span>
+					<span class="footer-text" style="background-color: {getDueDateColor(task.dueDate)};">
+						{task.dueDate.toISOString().split('T')[0]}
+					</span>
+				</span>
+			{/if}
+			{#each task.tags as tag}
+				<span>
+					<span class="footer-text" 
+						style="background-color: {getTagColor(tag)};">
+						#{tag}
+					</span>
+				</span>
+			{/each}
 		</div>
 	{/if}
 </div>
@@ -222,33 +232,17 @@
 							var(--background-modifier-border-focus);
 					}
 				}
-
-				.task-meta-line {
-					margin-top: var(--size-4-1);
-					display: flex;
-					flex-wrap: wrap;
-					gap: var(--size-4-1) var(--size-2-1);
-					align-items: center;
-
-					.due-date-text {
-						font-size: var(--font-ui-small);
-						color: black;
-						border-bottom: var(--border-width) solid;
-						padding-bottom: var(--size-1-1);
-					}
-
-					.tag-text {
-						font-size: var(--font-ui-small);
-						display: inline;
-						color: black;
-						border-bottom: var(--border-width) solid;
-						border-bottom-color: white;
-						padding-bottom: var(--size-1-1);
-					}
-				}
 			}
 		}
 
+		.task-tags {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--size-4-1) var(--size-2-1);
+			padding: var(--size-4-2) var(--size-2-2);
+			padding-top: 0;
+		}
+		
 		.task-footer {
 			padding: var(--size-4-2);
 			padding-top: 0;
@@ -258,7 +252,14 @@
 				font-size: var(--font-ui-smaller);
 			}
 		}
-
+		.footer-text {
+			font-size: var(--font-ui-small);
+			border-width: 0;
+			border-style: solid;
+			padding: 0.2em 0.4em;
+			border-radius: 12px;
+			color: var(--text-normal);
+		}
 	}
 
 	:global(.task-content *) {
