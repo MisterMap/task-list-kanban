@@ -136,7 +136,8 @@ export class Task {
 	}
 
 	get fileName() {
-		return this._path.split('/').pop() || this._path;
+		const fileName = this._path.split('/').pop() || this._path;
+		return fileName.endsWith('.md') ? fileName.slice(0, -3) : fileName;
 	}
 
 	private _column: ColumnTag | "archived" | undefined;
