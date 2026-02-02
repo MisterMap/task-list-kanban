@@ -11,7 +11,6 @@
 	export let task: Task;
 	export let taskActions: TaskActions;
 	export let columnTagTableStore: Readable<ColumnTagTable>;
-	export let showFilepath: boolean;
 	export let consolidateTags: boolean;
 	import sha256 from "crypto-js/sha256";
 
@@ -168,8 +167,9 @@
 	style="border: {getPriorityBorderWidth(task.priority)} solid {priorityColor};"
 >
 	<div class="task-body">
-		<div class="task-content">
-			{#if isEditing}
+		<div>
+			<div class="task-content">
+				{#if isEditing}
 					<textarea
 						class:editing={isEditing}
 						bind:this={textAreaEl}
@@ -178,44 +178,43 @@
 						on:input={onInput}
 						value={getEditableContent(task)}
 					/>
-			{:else}
-				<div
-					role="button"
-					class="content-preview"
-					on:mouseup={handleFocus}
-					on:keypress={handleOpenKeypress}
-					tabindex="0"
-				>
-					{@html mdContent}
-				</div>
+				{:else}
+					<div
+						role="button"
+						class="content-preview"
+						on:mouseup={handleFocus}
+						on:keypress={handleOpenKeypress}
+						tabindex="0"
+					>
+						{@html mdContent}
+					</div>
+				{/if}
+			</div>
+			<div class="task-project">
+				<p title={task.path}>{task.fileName}</p>
+			</div>
+			{#if task.dueDate || task.tags.size > 0}
+			<div class="task-tags">
+				{#if task.dueDate}
+					<span>
+						<span class="tag-text" style="background-color: {getDueDateColor(task.dueDate)};">
+							{formatDate(task.dueDate)}
+						</span>
+					</span>
+				{/if}
+				{#each task.tags as tag}
+					<span>
+						<span class="tag-text"
+							style="background-color: {getTagColor(tag)};">
+							#{tag}
+						</span>
+					</span>
+				{/each}
+			</div>
 			{/if}
 		</div>
 		<TaskMenu {task} {taskActions} {columnTagTableStore} menuColor={priorityColor} />
 	</div>
-	{#if showFilepath}
-		<div class="task-footer">
-			<p title={task.path}>{task.fileName}</p>
-		</div>
-	{/if}
-	{#if shouldconsolidateTags}
-		<div class="task-tags">
-			{#if task.dueDate}
-				<span>
-					<span class="footer-text" style="background-color: {getDueDateColor(task.dueDate)};">
-						{formatDate(task.dueDate)}
-					</span>
-				</span>
-			{/if}
-			{#each task.tags as tag}
-				<span>
-					<span class="footer-text" 
-						style="background-color: {getTagColor(tag)};">
-						#{tag}
-					</span>
-				</span>
-			{/each}
-		</div>
-	{/if}
 </div>
 
 <style lang="scss">
@@ -226,13 +225,14 @@
 		border-radius: var(--radius-m);
 		border: var(--border-width) solid var(--background-modifier-border);
 		cursor: grab;
+		padding: var(--size-4-2);
 
 		&.is-dragging {
 			opacity: 0.15;
 		}
 
 		.task-body {
-			padding: var(--size-4-2);
+			padding: 0;
 			display: grid;
 			grid-template-columns: 1fr auto;
 
@@ -259,32 +259,31 @@
 					}
 				}
 			}
-		}
 
-		.task-tags {
-			display: flex;
-			flex-wrap: wrap;
-			gap: var(--size-4-1) var(--size-2-1);
-			padding: var(--size-4-2) var(--size-2-2);
-			padding-top: 0;
-		}
-		
-		.task-footer {
-			padding: var(--size-4-2);
-			padding-top: 0;
+			.task-project {
+				padding-top: var(--size-4-2);
 
-			p {
-				margin: 0;
-				font-size: var(--font-ui-smaller);
+				p {
+					margin: 0;
+					font-size: var(--font-ui-smaller);
+				}
 			}
-		}
-		.footer-text {
-			font-size: var(--font-ui-small);
-			border-width: 0;
-			border-style: solid;
-			padding: 0.2em 0.4em;
-			border-radius: 12px;
-			color: var(--text-normal);
+
+			.task-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: var(--size-4-1) var(--size-2-1);
+				padding-top: var(--size-4-2);
+
+				.tag-text {
+					font-size: var(--font-ui-smaller);
+					border-width: 0;
+					border-style: solid;
+					padding: 0.2em 0.4em;
+					border-radius: 1em;
+					color: var(--text-normal);
+				}
+			}	
 		}
 	}
 
