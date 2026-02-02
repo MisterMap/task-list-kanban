@@ -152,6 +152,10 @@
 		const tagIndex = parseInt(sha256(tag).toString().slice(0, 8), 16) % 8 + 1;
 		return `var(--color-tag${tagIndex}-background)`;
 	}
+
+	function getPriorityBorderWidth(priority: number): string {
+		return priority < 3 ? 'var(--priority-task-border-width)' : 'var(--border-width)';
+	}
 </script>
 
 <div
@@ -161,7 +165,7 @@
 	draggable={!isEditing}
 	on:dragstart={handleDragStart}
 	on:dragend={handleDragEnd}
-	style="border: var(--border-width) solid {priorityColor};"
+	style="border: {getPriorityBorderWidth(task.priority)} solid {priorityColor};"
 >
 	<div class="task-body">
 		<div class="task-content">
@@ -216,7 +220,8 @@
 
 <style lang="scss">
 	.task {
-		--border-width: 1.5px;
+		--border-width: 1px;
+		--priority-task-border-width: 2px;
 		background-color: white;
 		border-radius: var(--radius-m);
 		border: var(--border-width) solid var(--background-modifier-border);

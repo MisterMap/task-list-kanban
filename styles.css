@@ -4,17 +4,17 @@
   --color-p1: #ffd700;
   --color-p1-background: #ffe699;
   --color-p2: #87ceeb;
-  --color-p2-background: #e6f0fc;
+  --color-p2-background: #abd7f1;
   --color-p3: #d3d3d3;
-  --color-p3-background: #f5f5f5;
-  --color-tag1-background: #fff5fa;   /* lighter pastel pink */
-  --color-tag2-background: #f8f8f8;   /* closer to white light grey */
-  --color-tag3-background: #f5faef;   /* lighter pastel green */
-  --color-tag4-background: #fff9ee;   /* lighter pastel apricot */
-  --color-tag5-background: #eaf8ff;   /* lighter pastel blue */
-  --color-tag6-background: #fffde6;   /* lighter pastel yellow */
-  --color-tag7-background: #fbf4fa;   /* lighter pastel purple */
-  --color-tag8-background: #f7fbfd;   /* lighter pastel cyan */
+  --color-p3-background: #ffffff;
+  --color-tag1-background: #ffadad;   /* lighter pastel pink */
+  --color-tag2-background: #ffd6a5;   /* closer to white light grey */
+  --color-tag3-background: #fdffb6;   /* lighter pastel green */
+  --color-tag4-background: #caffbf;   /* lighter pastel apricot */
+  --color-tag5-background: #9bf6ff;   /* lighter pastel blue */
+  --color-tag6-background: #a0c4ff;   /* lighter pastel yellow */
+  --color-tag7-background: #bdb2ff;   /* lighter pastel purple */
+  --color-tag8-background: #e5c185;   /* lighter pastel cyan */
 }
 
 /*
