@@ -40,7 +40,10 @@
 		isEditing = false;
 
 		const content = textAreaEl?.value;
-		if (!content) return;
+		if (!content) {
+			taskActions.updateContent(task.id, "");
+			return;
+		};
 
 		const updatedContent = content.replaceAll("\n", "<br />");
 
@@ -185,7 +188,6 @@
 						on:mouseup={handleFocus}
 						on:keypress={handleOpenKeypress}
 						tabindex="0"
-						style="min-height: 2em;"
 					>
 						{@html mdContent}
 					</div>
@@ -244,6 +246,7 @@
 
 			.task-content {
 				display: grid;
+				min-height: 1em;
 
 				textarea {
 					cursor: text;

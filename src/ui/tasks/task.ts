@@ -101,6 +101,13 @@ export class Task {
 	}
 	set content(value: string) {
 		// Update priority and remove it from content
+		console.log("content set to", value);
+		if (!value || value.trim() === "") {
+			this._content = "";
+			this._tags = new Set();
+			this._dueDate = null;
+			return;
+		}
 		const priorityMatch = value.match(/#p([0-3])/);
 		if (priorityMatch && priorityMatch[1] !== undefined) {
 			this._priority = parseInt(priorityMatch[1]);
@@ -113,7 +120,7 @@ export class Task {
 		}
 		this._tags = tags;
 		this._content = resultContent;
-		this._dueDate = date ?? this._dueDate;
+		this._dueDate = date;
 	}
 
 	private _done: boolean;
