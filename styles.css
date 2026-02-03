@@ -1,8 +1,8 @@
 :root {
   --color-p0: #FF7F50;
-  --color-p0-background: #ffd7ca;
+  --color-p0-background: #ffadad;
   --color-p1: #ffd700;
-  --color-p1-background: #ffe699;
+  --color-p1-background: #ffd6a5;
   --color-p2: #87ceeb;
   --color-p2-background: #abd7f1;
   --color-p3: #d3d3d3;
@@ -12,7 +12,7 @@
   --color-tag3-background: #fdffb6;   /* lighter pastel green */
   --color-tag4-background: #caffbf;   /* lighter pastel apricot */
   --color-tag5-background: #9bf6ff;   /* lighter pastel blue */
-  --color-tag6-background: #a0c4ff;   /* lighter pastel yellow */
+  --color-tag6-background: #abd7f1;   /* lighter pastel yellow */
   --color-tag7-background: #bdb2ff;   /* lighter pastel purple */
   --color-tag8-background: #e5c185;   /* lighter pastel cyan */
 }
