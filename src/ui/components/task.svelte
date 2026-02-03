@@ -185,6 +185,7 @@
 						on:mouseup={handleFocus}
 						on:keypress={handleOpenKeypress}
 						tabindex="0"
+						style="min-height: 2em;"
 					>
 						{@html mdContent}
 					</div>
