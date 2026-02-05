@@ -66,7 +66,7 @@
 	let isEditing = false;
 
 	function handleDragStart(e: DragEvent) {
-		handleContentBlur();
+		isEditing = false;
 		isDragging = true;
 		isDraggingStore.set({ fromColumn: task.column });
 		if (e.dataTransfer) {
