@@ -7,7 +7,7 @@ const settingsObject = z.object({
 	columns: z.array(z.object({ name: z.string(), maxTasks: z.number().default(10) })),
 	scope: z.union([z.literal("everywhere"), z.literal("folder")]),
 	showFilepath: z.boolean().default(true).optional(),
-	consolidateTags: z.boolean().default(false).optional(),
+	displayTagsInFooter: z.boolean().default(false).optional(),
 	match_pattern: z.string().optional(),
 	no_match_pattern: z.string().optional(),
 	sortOrder: z.array(z.union([
@@ -26,7 +26,7 @@ const defaultSettings: SettingValues = {
 	columns: [{ name: "Later", maxTasks: 10 }, { name: "Soonish", maxTasks: 10 }, { name: "Next week", maxTasks: 10 }, { name: "This week", maxTasks: 10 }, { name: "Today", maxTasks: 10 }, { name: "Pending", maxTasks: 10 }],
 	scope: "folder",
 	showFilepath: true,
-	consolidateTags: false,
+	displayTagsInFooter: false,
 	match_pattern: '',
 	no_match_pattern: '',
 	sortOrder: ["priority"],

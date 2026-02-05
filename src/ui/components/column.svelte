@@ -20,7 +20,7 @@
 	export let taskActions: TaskActions;
 	export let columnTagTableStore: Readable<ColumnTagTable>;
 	export let showFilepath: boolean;
-	export let consolidateTags: boolean;
+	export let displayTagsInFooter: boolean;
 	export let sortOrder: SortOrder[] = ["priority"];
 
 	function getColumnTitle(
@@ -160,7 +160,7 @@
 						{taskActions}
 						{columnTagTableStore}
 						{showFilepath}
-						{consolidateTags}
+						{displayTagsInFooter}
 					/>
 				{/each}
 				{#if isColumnTag(column, columnTagTableStore)}

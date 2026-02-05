@@ -35,7 +35,6 @@ describe("Task Sorter", () => {
             { path: "test.md" },
             1,
             {},
-            false
         );
 
         if (options.priority !== undefined) {

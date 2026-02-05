@@ -11,7 +11,7 @@
 	export let task: Task;
 	export let taskActions: TaskActions;
 	export let columnTagTableStore: Readable<ColumnTagTable>;
-	export let consolidateTags: boolean;
+	export let displayTagsInFooter: boolean;
 	import sha256 from "crypto-js/sha256";
 
 	const mdConverted = new Converter({
@@ -22,8 +22,6 @@
 
 	function getEditableContent(task: Task): string {
 		let editable = task.content.replaceAll("<br />", "\n");
-		
-		// Add tags
 		if (task.tags.size > 0) {
 			editable += " " + Array.from(task.tags).map(tag => `#${tag}`).join(" ");
 		}
@@ -99,9 +97,17 @@
 	}
 
 	$: {
+		console.log("--------------------------------");
+		console.log("task.content", task.content);
+		console.log("displayTagsInFooter for content preview", displayTagsInFooter);
+		console.log("task.tags for content preview", Array.from(task.tags));
+		let tagText = "";
+		if (!displayTagsInFooter && task.tags.size > 0) {
+			tagText = " " + Array.from(task.tags).map(tag => `#${tag}`).join(" ");
+		}
 		mdContent = mdConverted.makeHtml(
-			task.content + (task.blockLink ? ` ^${task.blockLink}` : ""),
-		);
+			task.content + tagText,
+		);	
 	}
 
 	$: {
@@ -115,8 +121,6 @@
 		e.currentTarget.style.height = `0px`;
 		e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
 	}
-
-	$: shouldconsolidateTags = consolidateTags && (task.tags.size > 0 || task.dueDate);
 
 	$: priorityColor = getPriorityColor(task.priority);
 	$: priorityBackgroundColor = getPriorityBackgroundColor(task.priority);
@@ -208,7 +212,7 @@
 			<div class="task-project">
 				<p title={task.path}>{task.fileName}</p>
 			</div>
-			{#if task.dueDate || task.tags.size > 0}
+			{#if task.dueDate || (displayTagsInFooter && task.tags.size > 0)}
 			<div class="task-tags">
 				{#if task.dueDate}
 					<span>
@@ -217,14 +221,16 @@
 						</span>
 					</span>
 				{/if}
-				{#each task.tags as tag}
-					<span>
-						<span class="tag-text"
-							style="background-color: {getTagColor(tag)};">
-							#{tag}
+				{#if displayTagsInFooter}
+					{#each task.tags as tag}
+						<span>
+							<span class="tag-text"
+								style="background-color: {getTagColor(tag)};">
+								#{tag}
+							</span>
 						</span>
-					</span>
-				{/each}
+					{/each}
+				{/if}
 			</div>
 			{/if}
 		</div>

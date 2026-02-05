@@ -53,7 +53,7 @@ export function createTasksStore(
 		metadataByTaskId.clear();
 		taskIdsByFileHandle.clear();
 
-		const consolidateTags = get(settingsStore).consolidateTags ?? false;
+		const displayTagsInFooter = get(settingsStore).displayTagsInFooter ?? false;
 
 		for (const fileHandle of fileHandles) {
 			if (!shouldHandle(fileHandle)) {
@@ -67,7 +67,7 @@ export function createTasksStore(
 				taskIdsByFileHandle,
 				vault,
 				columnTagTableStore,
-				consolidateTags,
+				displayTagsInFooter,
 			}).then(() => {
 				debounceSetTasks();
 			});
@@ -77,8 +77,8 @@ export function createTasksStore(
 	registerEvent(
 		vault.on("modify", (fileHandle) => {
 			if (fileHandle instanceof TFile && shouldHandle(fileHandle)) {
-				const consolidateTags =
-					get(settingsStore).consolidateTags ?? false;
+				const displayTagsInFooter =
+					get(settingsStore).displayTagsInFooter ?? true;
 				updateMapsFromFile({
 					fileHandle,
 					tasksByTaskId,
@@ -86,7 +86,7 @@ export function createTasksStore(
 					taskIdsByFileHandle,
 					vault,
 					columnTagTableStore,
-					consolidateTags,
+					displayTagsInFooter,
 				}).then(() => {
 					debounceSetTasks();
 				});
@@ -97,8 +97,8 @@ export function createTasksStore(
 	registerEvent(
 		vault.on("create", (fileHandle) => {
 			if (fileHandle instanceof TFile && shouldHandle(fileHandle)) {
-				const consolidateTags =
-					get(settingsStore).consolidateTags ?? false;
+				const displayTagsInFooter =
+					get(settingsStore).displayTagsInFooter ?? true;
 				updateMapsFromFile({
 					fileHandle,
 					tasksByTaskId,
@@ -106,7 +106,7 @@ export function createTasksStore(
 					taskIdsByFileHandle,
 					vault,
 					columnTagTableStore,
-					consolidateTags,
+					displayTagsInFooter,
 				}).then(() => {
 					debounceSetTasks();
 				});

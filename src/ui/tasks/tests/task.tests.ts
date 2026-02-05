@@ -34,11 +34,11 @@ describe("Task", () => {
 		let task: Task | undefined;
 		const taskString = "- [ ] Something #tag";
 		if (isTaskString(taskString)) {
-			task = new Task(taskString, { path: "/" }, 0, columnTags, false);
+			task = new Task(taskString, { path: "/" }, 0, columnTags);
 		}
 
 		expect(task).toBeTruthy();
-		expect(task?.content).toBe("Something #tag");
+		expect(task?.content).toBe("Something");
 		expect(task?.tags.has("tag")).toBeTruthy();
 	});
 
@@ -46,11 +46,11 @@ describe("Task", () => {
 		let task: Task | undefined;
 		const taskString = "- [ ] Something #tag #column";
 		if (isTaskString(taskString)) {
-			task = new Task(taskString, { path: "/" }, 0, columnTags, false);
+			task = new Task(taskString, { path: "/" }, 0, columnTags);
 		}
 
 		expect(task).toBeTruthy();
-		expect(task?.content).toBe("Something #tag");
+		expect(task?.content).toBe("Something");
 		expect(task?.column).toBe(kebab<ColumnTag>("column"));
 	});
 
@@ -58,7 +58,7 @@ describe("Task", () => {
 		let task: Task | undefined;
 		const taskString = "- [ ] Something #tag #column";
 		if (isTaskString(taskString)) {
-			task = new Task(taskString, { path: "/" }, 0, columnTags, false);
+			task = new Task(taskString, { path: "/" }, 0, columnTags);
 		}
 
 		const expectedOutput = `- [ ] Something #tag #column ${formatTaskDate(DateType.STATUS_CHANGED, mockDate)} ${formatTaskDate(DateType.CREATED, mockDate)}`;
@@ -70,7 +70,7 @@ describe("Task", () => {
 		let task: Task | undefined;
 		const taskString = "- [ ] Something #tag #column";
 		if (isTaskString(taskString)) {
-			task = new Task(taskString, { path: "/" }, 0, columnTags, true);
+			task = new Task(taskString, { path: "/" }, 0, columnTags);
 		}
 
 		const expectedOutput = `- [ ] Something #tag #column ${formatTaskDate(DateType.STATUS_CHANGED, mockDate)} ${formatTaskDate(DateType.CREATED, mockDate)}`;
@@ -82,11 +82,11 @@ describe("Task", () => {
 		let task: Task | undefined;
 		const taskString = "- [ ] Something #tag #column ^link-link";
 		if (isTaskString(taskString)) {
-			task = new Task(taskString, { path: "/" }, 0, columnTags, false);
+			task = new Task(taskString, { path: "/" }, 0, columnTags);
 		}
 
 		expect(task).toBeTruthy();
-		expect(task?.content).toBe("Something #tag");
+		expect(task?.content).toBe("Something");
 		expect(task?.blockLink).toBe("link-link");
 	});
 
@@ -94,7 +94,7 @@ describe("Task", () => {
 		let task: Task | undefined;
 		const taskString = "- [ ] Something #tag ^link-link";
 		if (isTaskString(taskString)) {
-			task = new Task(taskString, { path: "/" }, 0, columnTags, false);
+			task = new Task(taskString, { path: "/" }, 0, columnTags);
 			task.column = kebab<ColumnTag>("column");
 		}
 
@@ -115,7 +115,7 @@ describe("Task", () => {
 			let task: Task | undefined;
 			
 			if (isTaskString(taskString)) {
-				task = new Task(taskString, { path: "/" }, 0, columnTags, false);
+				task = new Task(taskString, { path: "/" }, 0, columnTags);
 			}
 
 			expect(task).toBeTruthy();
@@ -129,7 +129,7 @@ describe("Task", () => {
 			let task: Task | undefined;
 			
 			if (isTaskString(taskString)) {
-				task = new Task(taskString, { path: "/" }, 0, columnTags, false);
+				task = new Task(taskString, { path: "/" }, 0, columnTags);
 			}
 
 			expect(task).toBeTruthy();
@@ -144,7 +144,7 @@ describe("Task", () => {
 			let task: Task | undefined;
 			
 			if (isTaskString(taskString)) {
-				task = new Task(taskString, { path: "/" }, 0, columnTags, false);
+				task = new Task(taskString, { path: "/" }, 0, columnTags);
 			}
 
 			expect(task).toBeTruthy();
@@ -155,22 +155,21 @@ describe("Task", () => {
 			expect(task?.statusChangedDate).not.toBe(initialStatusDate);
 		});
 
-		it("preserves dates when content is updated", () => {
+		it("removes due dates when content is updated", () => {
 			const taskString = "- [ ] Task with [due:: 2024-03-25] and [statusChanged:: 2024-03-24] and [created:: 2024-03-23]";
 			let task: Task | undefined;
 			
 			if (isTaskString(taskString)) {
-				task = new Task(taskString, { path: "/" }, 0, columnTags, false);
+				task = new Task(taskString, { path: "/" }, 0, columnTags);
 			}
 
 			expect(task).toBeTruthy();
-			const originalDueDate = task?.dueDate;
 			const originalStatusDate = task?.statusChangedDate;
 			const originalCreatedDate = task?.createdDate;
 
 			task!.content = "Updated task content";
 
-			expect(task?.dueDate).toBe(originalDueDate);
+			expect(task?.dueDate).toBeNull();
 			expect(task?.statusChangedDate).toBe(originalStatusDate);
 			expect(task?.createdDate).toBe(originalCreatedDate);
 		});

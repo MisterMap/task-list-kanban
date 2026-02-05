@@ -52,14 +52,14 @@ export class SettingsModal extends Modal {
 			});
 
 		new Setting(this.contentEl)
-			.setName("Consolidate tags")
+			.setName("Display tags in footer")
 			.setDesc(
-				"Consolidate the tags on each task in Kanban into the footer?"
+				"Display tags as badges in the footer? If off, tags remain in task text."
 			)
 			.addToggle((toggle) => {
-				toggle.setValue(this.settings.consolidateTags ?? false);
+				toggle.setValue(this.settings.displayTagsInFooter ?? true);
 				toggle.onChange((value) => {
-					this.settings.consolidateTags = value;
+					this.settings.displayTagsInFooter = value;
 				});
 			});
 

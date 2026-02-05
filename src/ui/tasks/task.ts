@@ -11,7 +11,6 @@ export class Task {
 		fileHandle: { path: string },
 		readonly rowIndex: number,
 		columnTagTable: ColumnTagTable,
-		private readonly consolidateTags: boolean
 	) {
 		const [, blockLink] = rawContent.match(blockLinkRegexp) ?? [];
 		this.blockLink = blockLink;
@@ -83,8 +82,12 @@ export class Task {
 					this._column = tag as ColumnTag;
 				}
 				tags.delete(tag);
+				// Always strip column tags from content
+				this._content = this._content.replaceAll(`#${tag}`, "").trim();
+			} else {
+				// Strip regular tags from content
+				this._content = this._content.replaceAll(`#${tag}`, "").trim();
 			}
-			this._content = this._content.replaceAll(`#${tag}`, "").trim();
 		}
 
 		this._tags = tags;
@@ -113,13 +116,15 @@ export class Task {
 			this._priority = parseInt(priorityMatch[1]);
 			value = value.replace(/#p[0-3]/, '').trim();
 		}
-		const { content: resultContent, date } = this.extractDueDate(value);
-		const tags = getTagsFromContent(resultContent);
+		const { content: contentWithoutDueDate, date } = this.extractDueDate(value);
+		const tags = getTagsFromContent(contentWithoutDueDate);
+		let contentWithoutTags = contentWithoutDueDate;
 		for (const tag of tags) {
-			this._content = this._content.replaceAll(`#${tag}`, "").trim();
+			contentWithoutTags = contentWithoutTags.replaceAll(`#${tag}`, "").trim();
 		}
 		this._tags = tags;
-		this._content = resultContent;
+		console.log("tags", Array.from(tags));
+		this._content = contentWithoutTags;
 		this._dueDate = date;
 	}
 
@@ -198,7 +203,7 @@ export class Task {
 		return [
 			`- [${this.done ? "x" : " "}] `,
 			this.content.trim(),
-			this.consolidateTags && this._tags.size > 0
+			this._tags.size > 0
 				? ` ${Array.from(this._tags)
 						.map((tag) => `#${tag}`)
 						.join(" ")}`

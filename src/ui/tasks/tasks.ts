@@ -18,7 +18,7 @@ export async function updateMapsFromFile({
 	metadataByTaskId,
 	vault,
 	columnTagTableStore,
-	consolidateTags,
+	displayTagsInFooter,
 }: {
 	fileHandle: TFile;
 	tasksByTaskId: Map<string, Task>;
@@ -26,7 +26,7 @@ export async function updateMapsFromFile({
 	taskIdsByFileHandle: Map<TFile, Set<string>>;
 	vault: Vault;
 	columnTagTableStore: Readable<ColumnTagTable>;
-	consolidateTags: boolean;
+	displayTagsInFooter: boolean;
 }) {
 	try {
 		const previousTaskIds =
@@ -49,7 +49,6 @@ export async function updateMapsFromFile({
 					fileHandle,
 					i,
 					columnTagTable,
-					consolidateTags
 				);
 
 				newTaskIds.add(task.id);

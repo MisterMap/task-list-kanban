@@ -73,7 +73,7 @@
 
 	$: tasksByColumn = groupByColumnTag(filteredByTag);
 
-	$: ({ showFilepath = true, consolidateTags = false, sortOrder = ["priority"] } = $settingsStore);
+	$: ({ showFilepath = true, displayTagsInFooter = false, sortOrder = ["priority"] } = $settingsStore);
 </script>
 
 <div class="main">
@@ -86,7 +86,7 @@
 				{taskActions}
 				{columnTagTableStore}
 				{showFilepath}
-				{consolidateTags}
+				{displayTagsInFooter}
 				{sortOrder}
 			/>
 			{#each columns as column}
@@ -96,7 +96,7 @@
 					{taskActions}
 					{columnTagTableStore}
 					{showFilepath}
-					{consolidateTags}
+					{displayTagsInFooter}
 					{sortOrder}
 				/>
 			{/each}
@@ -106,7 +106,7 @@
 				{taskActions}
 				{columnTagTableStore}
 				{showFilepath}
-				{consolidateTags}
+				{displayTagsInFooter}
 				{sortOrder}
 			/>
 		</div>
