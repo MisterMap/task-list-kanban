@@ -119,6 +119,7 @@
 	$: shouldconsolidateTags = consolidateTags && (task.tags.size > 0 || task.dueDate);
 
 	$: priorityColor = getPriorityColor(task.priority);
+	$: priorityBackgroundColor = getPriorityBackgroundColor(task.priority);
 
 	const priorityColors = {
 		0: 'var(--color-p0)',
@@ -127,8 +128,19 @@
 		default: 'var(--color-p3)'
 	};
 
+	const priorityBackgroundColors = {
+		0: 'var(--color-p0-background)',
+		1: 'var(--color-p1-background)',
+		2: 'var(--color-p2-background)',
+		default: 'var(--color-p3-background)'
+	};
+
 	function getPriorityColor(priority: number): string {
 		return priorityColors[priority as keyof typeof priorityColors] || priorityColors.default;
+	}
+
+	function getPriorityBackgroundColor(priority: number): string {
+		return priorityBackgroundColors[priority as keyof typeof priorityBackgroundColors] || priorityBackgroundColors.default;
 	}
 
 	function getDueDateColor(dueDate: Date): string {
@@ -140,11 +152,11 @@
 		next7days.setDate(next7days.getDate() + 7);
 
 		if (dueDate < today) {
-			return 'var(--color-p0-background)'; // past due - red
+			return 'var(--color-p0)'; // past due - red
 		} else if (dueDate < tomorrow) {
-			return 'var(--color-p1-background)'; // due today - orange
+			return 'var(--color-p1)'; // due today - orange
 		} else if (dueDate < next7days) {
-			return 'var(--color-p2-background)'; // due in the future - blue
+			return 'var(--color-p2)'; // due in the future - blue
 		} else {
 			return 'var(--color-p3-background)'; // due more than 7 days from now - grey
 		}
@@ -167,7 +179,7 @@
 	draggable={!isEditing}
 	on:dragstart={handleDragStart}
 	on:dragend={handleDragEnd}
-	style="border: {getPriorityBorderWidth(task.priority)} solid {priorityColor};"
+	style="border: {getPriorityBorderWidth(task.priority)} solid {priorityColor}; background-color: {priorityBackgroundColor};"
 >
 	<div class="task-body">
 		<div>
@@ -224,7 +236,6 @@
 	.task {
 		--border-width: 1px;
 		--priority-task-border-width: 2px;
-		background-color: white;
 		border-radius: var(--radius-m);
 		border: var(--border-width) solid var(--background-modifier-border);
 		cursor: grab;
