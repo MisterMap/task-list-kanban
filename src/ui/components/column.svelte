@@ -19,7 +19,6 @@
 	export let tasks: Task[];
 	export let taskActions: TaskActions;
 	export let columnTagTableStore: Readable<ColumnTagTable>;
-	export let showFilepath: boolean;
 	export let displayTagsInFooter: boolean;
 	export let sortOrder: SortOrder[] = ["priority"];
 
@@ -159,7 +158,6 @@
 						{task}
 						{taskActions}
 						{columnTagTableStore}
-						{showFilepath}
 						{displayTagsInFooter}
 					/>
 				{/each}

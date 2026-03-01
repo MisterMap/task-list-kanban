@@ -73,7 +73,7 @@
 
 	$: tasksByColumn = groupByColumnTag(filteredByTag);
 
-	$: ({ showFilepath = true, displayTagsInFooter = false, sortOrder = ["priority"] } = $settingsStore);
+	$: ({displayTagsInFooter = false, sortOrder = ["priority"] } = $settingsStore);
 </script>
 
 <div class="main">
@@ -85,7 +85,6 @@
 				tasks={tasksByColumn["uncategorised"]}
 				{taskActions}
 				{columnTagTableStore}
-				{showFilepath}
 				{displayTagsInFooter}
 				{sortOrder}
 			/>
@@ -95,7 +94,6 @@
 					tasks={tasksByColumn[column] ?? []}
 					{taskActions}
 					{columnTagTableStore}
-					{showFilepath}
 					{displayTagsInFooter}
 					{sortOrder}
 				/>
@@ -105,7 +103,6 @@
 				tasks={tasksByColumn["done"] ?? []}
 				{taskActions}
 				{columnTagTableStore}
-				{showFilepath}
 				{displayTagsInFooter}
 				{sortOrder}
 			/>

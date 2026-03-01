@@ -85,13 +85,13 @@ export class HeaderCountersController {
 
 		this.renderHeaderCounter(
 			this.elements.totalNextWeekEl,
-			"Total next week",
+			"Total",
 			totalNextWeek.length,
 			settings.totalNextWeekMax,
 		);
 		this.renderHeaderCounter(
 			this.elements.criticalNextWeekEl,
-			"Critical next week",
+			"Critical",
 			criticalNextWeek.length,
 			settings.criticalNextWeekMax,
 		);
