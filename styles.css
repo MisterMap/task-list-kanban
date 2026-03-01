@@ -15,6 +15,7 @@
   --color-tag6-background: #abd7f1;   /* lighter pastel yellow */
   --color-tag7-background: #bdb2ff;   /* lighter pastel purple */
   --color-tag8-background: #e5c185;   /* lighter pastel cyan */
+  --task-count-highlight-background: #FF7F50;
 }
 
 /*
@@ -39,6 +40,17 @@ If your plugin does not need CSS, delete this file.
 	width: 100%;
 }
 
+.task-count,
+.kanban-header-count {
+	color: white;
+	background-color: var(--color-accent);
+}
+
+.task-count.highlight,
+.kanban-header-count.highlight {
+	background-color: var(--task-count-highlight-background);
+}
+
 .kanban-header-count {
 	display: inline-flex;
 	align-items: center;
@@ -47,6 +59,4 @@ If your plugin does not need CSS, delete this file.
 	border-radius: 999px;
 	font-size: var(--font-ui-smaller);
 	font-weight: var(--font-medium);
-	color: var(--text-normal);
-	background-color: var(--kanban-header-count-color, var(--color-p2));
 }

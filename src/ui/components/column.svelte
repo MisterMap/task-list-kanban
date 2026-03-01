@@ -217,18 +217,11 @@
 				margin: 0;
 
 				.task-count {
-					background-color: var(--color-accent);
-					color: white;
 					border-radius: 12px;
 					padding: 0 8px;
 					font-size: 0.8em;
 					margin-left: 8px;
-					font-weight: var(--font-normal); // Added this line to make the font less bold
-
-					&.highlight {
-						background-color: coral;
-						color: white;
-					}
+					font-weight: var(--font-normal);
 				}
 			}
 		}

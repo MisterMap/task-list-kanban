@@ -64,12 +64,11 @@ export class HeaderCountersController {
 		count: number,
 		max: number | undefined,
 	) {
-		const color =
-			max !== undefined && count > max ? "var(--color-p0)" : "var(--color-p2)";
+		const isHighlighted = max !== undefined && count > max;
 		const countText = max !== undefined ? `${count}/${max}` : `${count}`;
 
 		el.setText(`${label}: ${countText}`);
-		el.style.setProperty("--kanban-header-count-color", color);
+		el.classList.toggle("highlight", isHighlighted);
 	}
 
 	private render(tasks: Task[], settings: SettingValues) {
