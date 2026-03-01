@@ -14,13 +14,10 @@ import { createTasksStore } from "./tasks/store";
 import type { Task } from "./tasks/task";
 import type { TaskActions } from "./tasks/actions";
 import {
-	filterTasksByDate,
-	filterTasksByPriorities,
-} from "./tasks/task_filter";
-import {
 	createColumnTagTableStore,
 	type ColumnTagTable,
 } from "./columns/columns";
+import { HeaderCountersController } from "./header_counters";
 
 export const KANBAN_VIEW_NAME = "kanban-view";
 
@@ -37,7 +34,7 @@ export class KanbanView extends TextFileView implements HoverParent {
 	private readonly tasksStore: Writable<Task[]>;
 	private readonly taskActions: TaskActions;
 	private readonly initialiseTasksStore: () => void;
-	private destroyTaskCountHeader: (() => void) | undefined;
+	private readonly headerCountersController: HeaderCountersController;
 
 	component: Main | undefined;
 	icon = "kanban-square";
@@ -76,6 +73,10 @@ export class KanbanView extends TextFileView implements HoverParent {
 		this.tasksStore = tasksStore;
 		this.taskActions = taskActions;
 		this.initialiseTasksStore = initialise;
+		this.headerCountersController = new HeaderCountersController(
+			this.tasksStore,
+			this.settingsStore,
+		);
 	}
 
 	private onLocalSettingsChange(newSettings: SettingValues) {
@@ -134,7 +135,7 @@ ${parsed.body}
 		// TODO
 	}
 
-	async onOpen() {
+	private mountMainComponent() {
 		this.component = new Main({
 			target: this.contentEl,
 			props: {
@@ -144,42 +145,21 @@ ${parsed.body}
 				settingsStore: this.settingsStore,
 			},
 		});
+	}
+
+	async onOpen() {
+		this.mountMainComponent();
 
 		const gearEl = this.addAction("gear", "Kanban settings", () =>
 			this.openSettingsModal()
 		);
-		const dueOrNoDateEl = createDiv({ cls: "kanban-header-count" });
-		dueOrNoDateEl.setAttr(
-			"title",
-			"All tasks without dueDate or due in next 7 days",
-		);
-		gearEl.before(dueOrNoDateEl);
-
-		const dueOrNoDatePriorityEl = createDiv({ cls: "kanban-header-count" });
-		dueOrNoDatePriorityEl.setAttr(
-			"title",
-			"All tasks without dueDate or due in next 7 days with priority p0/p1/p2",
-		);
-		gearEl.before(dueOrNoDatePriorityEl);
-
-		this.destroyTaskCountHeader = this.tasksStore.subscribe((tasks) => {
-			const activeTasks = tasks.filter((task) => !task.done);
-			const dueOrNoDate = filterTasksByDate(activeTasks, 7, "dueDate", true);
-			const dueOrNoDatePriority = filterTasksByPriorities(dueOrNoDate, [
-				0, 1, 2,
-			]);
-
-			dueOrNoDateEl.setText(`Total next week: ${dueOrNoDate.length}`);
-			dueOrNoDatePriorityEl.setText(
-				`Critical next week: ${dueOrNoDatePriority.length}`,
-			);
-		});
+		this.headerCountersController.mount(gearEl);
 	}
 
 	async onClose() {
 		this.component?.$destroy();
 		this.destroySettingsStore();
-		this.destroyTaskCountHeader?.();
+		this.headerCountersController.unmount();
 	}
 
 	onPaneMenu(menu: Menu, source: string): void {

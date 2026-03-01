@@ -64,6 +64,52 @@ export class SettingsModal extends Modal {
 			});
 
 		new Setting(this.contentEl)
+			.setName("Total next week max")
+			.setDesc("Max allowed for 'Total next week'. Empty means no max.")
+			.addText((text) => {
+				text.setPlaceholder("");
+				text.setValue(
+					this.settings.totalNextWeekMax === undefined
+						? ""
+						: String(this.settings.totalNextWeekMax)
+				);
+				text.onChange((value) => {
+					const trimmed = value.trim();
+					if (!trimmed) {
+						this.settings.totalNextWeekMax = undefined;
+						return;
+					}
+					const parsed = parseInt(trimmed, 10);
+					this.settings.totalNextWeekMax = Number.isNaN(parsed)
+						? undefined
+						: Math.max(0, parsed);
+				});
+			});
+
+		new Setting(this.contentEl)
+			.setName("Critical next week max")
+			.setDesc("Max allowed for 'Critical next week'. Empty means no max.")
+			.addText((text) => {
+				text.setPlaceholder("");
+				text.setValue(
+					this.settings.criticalNextWeekMax === undefined
+						? ""
+						: String(this.settings.criticalNextWeekMax)
+				);
+				text.onChange((value) => {
+					const trimmed = value.trim();
+					if (!trimmed) {
+						this.settings.criticalNextWeekMax = undefined;
+						return;
+					}
+					const parsed = parseInt(trimmed, 10);
+					this.settings.criticalNextWeekMax = Number.isNaN(parsed)
+						? undefined
+						: Math.max(0, parsed);
+				});
+			});
+
+		new Setting(this.contentEl)
 			.setName("Match Pattern")
 			.setDesc("Pattern to match tasks during creation")
 			.addText((text) => {

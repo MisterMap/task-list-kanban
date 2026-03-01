@@ -47,6 +47,6 @@ If your plugin does not need CSS, delete this file.
 	border-radius: 999px;
 	font-size: var(--font-ui-smaller);
 	font-weight: var(--font-medium);
-	color: var(--text-muted);
-	background-color: var(--background-modifier-hover);
+	color: var(--text-normal);
+	background-color: var(--kanban-header-count-color, var(--color-p2));
 }

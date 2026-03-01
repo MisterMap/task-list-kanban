@@ -8,6 +8,8 @@ const settingsObject = z.object({
 	scope: z.union([z.literal("everywhere"), z.literal("folder")]),
 	showFilepath: z.boolean().default(true).optional(),
 	displayTagsInFooter: z.boolean().default(false).optional(),
+	totalNextWeekMax: z.number().int().nonnegative().optional(),
+	criticalNextWeekMax: z.number().int().nonnegative().optional(),
 	match_pattern: z.string().optional(),
 	no_match_pattern: z.string().optional(),
 	sortOrder: z.array(z.union([
@@ -27,6 +29,8 @@ const defaultSettings: SettingValues = {
 	scope: "folder",
 	showFilepath: true,
 	displayTagsInFooter: false,
+	totalNextWeekMax: undefined,
+	criticalNextWeekMax: undefined,
 	match_pattern: '',
 	no_match_pattern: '',
 	sortOrder: ["priority"],
