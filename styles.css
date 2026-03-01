@@ -38,3 +38,15 @@ If your plugin does not need CSS, delete this file.
 .setting-item.column .setting-item-control > input {
 	width: 100%;
 }
+
+.kanban-header-count {
+	display: inline-flex;
+	align-items: center;
+	padding: 2px 8px;
+	margin-right: 8px;
+	border-radius: 999px;
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-medium);
+	color: var(--text-muted);
+	background-color: var(--background-modifier-hover);
+}

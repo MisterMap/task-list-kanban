@@ -14,6 +14,10 @@ import { createTasksStore } from "./tasks/store";
 import type { Task } from "./tasks/task";
 import type { TaskActions } from "./tasks/actions";
 import {
+	filterTasksByDate,
+	filterTasksByPriorities,
+} from "./tasks/task_filter";
+import {
 	createColumnTagTableStore,
 	type ColumnTagTable,
 } from "./columns/columns";
@@ -33,6 +37,7 @@ export class KanbanView extends TextFileView implements HoverParent {
 	private readonly tasksStore: Writable<Task[]>;
 	private readonly taskActions: TaskActions;
 	private readonly initialiseTasksStore: () => void;
+	private destroyTaskCountHeader: (() => void) | undefined;
 
 	component: Main | undefined;
 	icon = "kanban-square";
@@ -140,12 +145,41 @@ ${parsed.body}
 			},
 		});
 
-		this.addAction("gear", "Kanban settings", () => this.openSettingsModal());
+		const gearEl = this.addAction("gear", "Kanban settings", () =>
+			this.openSettingsModal()
+		);
+		const dueOrNoDateEl = createDiv({ cls: "kanban-header-count" });
+		dueOrNoDateEl.setAttr(
+			"title",
+			"All tasks without dueDate or due in next 7 days",
+		);
+		gearEl.before(dueOrNoDateEl);
+
+		const dueOrNoDatePriorityEl = createDiv({ cls: "kanban-header-count" });
+		dueOrNoDatePriorityEl.setAttr(
+			"title",
+			"All tasks without dueDate or due in next 7 days with priority p0/p1/p2",
+		);
+		gearEl.before(dueOrNoDatePriorityEl);
+
+		this.destroyTaskCountHeader = this.tasksStore.subscribe((tasks) => {
+			const activeTasks = tasks.filter((task) => !task.done);
+			const dueOrNoDate = filterTasksByDate(activeTasks, 7, "dueDate", true);
+			const dueOrNoDatePriority = filterTasksByPriorities(dueOrNoDate, [
+				0, 1, 2,
+			]);
+
+			dueOrNoDateEl.setText(`Total next week: ${dueOrNoDate.length}`);
+			dueOrNoDatePriorityEl.setText(
+				`Critical next week: ${dueOrNoDatePriority.length}`,
+			);
+		});
 	}
 
 	async onClose() {
 		this.component?.$destroy();
 		this.destroySettingsStore();
+		this.destroyTaskCountHeader?.();
 	}
 
 	onPaneMenu(menu: Menu, source: string): void {
