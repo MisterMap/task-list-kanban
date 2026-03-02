@@ -6,7 +6,7 @@
 	import TaskMenu from "./task_menu.svelte";
 	import { Converter } from "showdown";
 	import type { Readable } from "svelte/store";
-	import { formatDate } from "../tasks/date_utils";
+	import { formatDate, getCurrentDate } from "../tasks/date_utils";
 
 	export let task: Task;
 	export let taskActions: TaskActions;
@@ -148,7 +148,7 @@
 	}
 
 	function getDueDateColor(dueDate: Date): string {
-		const today = new Date();
+		const today = getCurrentDate();
 		today.setHours(0, 0, 0, 0);
 		const tomorrow = new Date(today);
 		tomorrow.setDate(tomorrow.getDate() + 1);

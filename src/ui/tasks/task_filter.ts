@@ -1,3 +1,4 @@
+import { getCurrentDate } from "./date_utils";
 import type { Task } from "./task";
 
 export type TaskPriority = 0 | 1 | 2 | 3;
@@ -27,8 +28,9 @@ export function filterTasksByDate(
 	dateField: TaskDateField = "dueDate",
 	includeEmpty = true,
 ): Task[] {
-	const today = new Date();
-	const targetDate = new Date();
+	const today = getCurrentDate();
+	today.setHours(0, 0, 0, 0);
+	const targetDate = new Date(today);
 	targetDate.setDate(today.getDate() + days);
 
 	return tasks.filter((task) => {

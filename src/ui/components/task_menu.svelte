@@ -83,6 +83,14 @@
 		});
 
 		menu.addItem((i) => {
+			i.setTitle("Next week").onClick(() => {
+				const nextWeek = getCurrentDate();
+				nextWeek.setDate(nextWeek.getDate() + 7);
+				taskActions.updateDueDate(task.id, nextWeek);
+			});
+		});
+
+		menu.addItem((i) => {
 			i.setTitle("Remove due date").onClick(() => {
 				taskActions.updateDueDate(task.id, null);
 			});
