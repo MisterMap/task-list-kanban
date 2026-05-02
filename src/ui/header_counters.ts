@@ -1,27 +1,45 @@
 import { get, type Writable } from "svelte/store";
 import type { Task } from "./tasks/task";
-import type { SettingValues } from "./settings/settings_store";
-import { filterTasksByDate, filterTasksByPriorities } from "./tasks/task_filter";
+import type { HeaderCounterSettings, SettingValues } from "./settings/settings_store";
+import { TaskFilter } from "./tasks/task_filter";
 
-type CounterElements = {
-	totalNextWeekEl: HTMLDivElement;
-	criticalNextWeekEl: HTMLDivElement;
-};
+class HeaderCounter {
+	readonly label: string;
+	readonly filterText: string;
+	readonly maxTasks: number | undefined;
+	private readonly taskFilter: TaskFilter;
+
+	constructor(headerCounterSettings: HeaderCounterSettings) {
+		this.label = headerCounterSettings.label;
+		this.filterText = headerCounterSettings.filter;
+		this.maxTasks = headerCounterSettings.maxTasks;
+		this.taskFilter = new TaskFilter(headerCounterSettings.filter);
+	}
+
+	countTasks(tasks: Task[]): number {
+		return tasks.filter((task) => this.taskFilter.matchesTask(task)).length;
+	}
+
+	isExceeded(count: number): boolean {
+		return this.maxTasks !== undefined && count > this.maxTasks;
+	}
+}
 
 export class HeaderCountersController {
-	private elements: CounterElements | undefined;
+	private counterElements: HTMLDivElement[] = [];
+	private gearElement: HTMLElement | undefined;
 	private unsubscribeTasks: (() => void) | undefined;
 	private unsubscribeSettings: (() => void) | undefined;
-	private readonly criticalPriorities = [0, 1, 2] as const;
 
 	constructor(
 		private readonly tasksStore: Writable<Task[]>,
 		private readonly settingsStore: Writable<SettingValues>,
 	) {}
 
-	mount(gearEl: HTMLElement) {
+	mount(gearElement: HTMLElement) {
 		this.unmount();
-		this.elements = this.createHeaderCounters(gearEl);
+		this.gearElement = gearElement;
+		this.synchroniseHeaderCounterElements(get(this.settingsStore));
 
 		this.unsubscribeTasks = this.tasksStore.subscribe((tasks) => {
 			this.render(tasks, get(this.settingsStore));
@@ -37,62 +55,67 @@ export class HeaderCountersController {
 		this.unsubscribeSettings?.();
 		this.unsubscribeTasks = undefined;
 		this.unsubscribeSettings = undefined;
-		this.elements = undefined;
+		this.gearElement = undefined;
+		for (const counterElement of this.counterElements) {
+			counterElement.remove();
+		}
+		this.counterElements = [];
 	}
 
-	private createHeaderCounters(gearEl: HTMLElement): CounterElements {
-		const totalNextWeekEl = createDiv({ cls: "kanban-header-count" });
-		totalNextWeekEl.setAttr(
-			"title",
-			"All tasks without dueDate or due in next 7 days",
-		);
-		gearEl.before(totalNextWeekEl);
-
-		const criticalNextWeekEl = createDiv({ cls: "kanban-header-count" });
-		criticalNextWeekEl.setAttr(
-			"title",
-			"All tasks without dueDate or due in next 7 days with priority p0/p1/p2",
-		);
-		gearEl.before(criticalNextWeekEl);
-
-		return { totalNextWeekEl, criticalNextWeekEl };
-	}
-
-	private renderHeaderCounter(
-		el: HTMLElement,
-		label: string,
-		count: number,
-		max: number | undefined,
-	) {
-		const isHighlighted = max !== undefined && count > max;
-		const countText = max !== undefined ? `${count}/${max}` : `${count}`;
-
-		el.setText(`${label}: ${countText}`);
-		el.classList.toggle("highlight", isHighlighted);
-	}
-
-	private render(tasks: Task[], settings: SettingValues) {
-		if (!this.elements) {
+	private synchroniseHeaderCounterElements(settings: SettingValues) {
+		if (!this.gearElement) {
 			return;
 		}
 
-		const activeTasks = tasks.filter((task) => !task.done);
-		const totalNextWeek = filterTasksByDate(activeTasks, 7, "dueDate", true);
-		const criticalNextWeek = filterTasksByPriorities(totalNextWeek, [
-			...this.criticalPriorities,
-		]);
+		while (this.counterElements.length < settings.headerCounters.length) {
+			const counterElement = createDiv({ cls: "kanban-header-count" });
+			this.gearElement.before(counterElement);
+			this.counterElements.push(counterElement);
+		}
 
-		this.renderHeaderCounter(
-			this.elements.totalNextWeekEl,
-			"Total",
-			totalNextWeek.length,
-			settings.totalNextWeekMax,
-		);
-		this.renderHeaderCounter(
-			this.elements.criticalNextWeekEl,
-			"Critical",
-			criticalNextWeek.length,
-			settings.criticalNextWeekMax,
-		);
+		while (this.counterElements.length > settings.headerCounters.length) {
+			const counterElement = this.counterElements.pop();
+			counterElement?.remove();
+		}
+	}
+
+	private renderHeaderCounter(
+		element: HTMLElement,
+		headerCounter: HeaderCounter,
+		tasks: Task[],
+	) {
+		const count = headerCounter.countTasks(tasks);
+		const countText =
+			headerCounter.maxTasks !== undefined
+				? `${count}/${headerCounter.maxTasks}`
+				: `${count}`;
+
+		element.setText(`${headerCounter.label}: ${countText}`);
+		element.setAttr("title", headerCounter.filterText);
+		element.classList.toggle("highlight", headerCounter.isExceeded(count));
+	}
+
+	private render(tasks: Task[], settings: SettingValues) {
+		this.synchroniseHeaderCounterElements(settings);
+
+		if (!settings.headerCounters.length) {
+			return;
+		}
+
+		for (const [
+			headerCounterIndex,
+			headerCounterSetting,
+		] of settings.headerCounters.entries()) {
+			const counterElement = this.counterElements[headerCounterIndex];
+			if (!counterElement) {
+				continue;
+			}
+
+			this.renderHeaderCounter(
+				counterElement,
+				new HeaderCounter(headerCounterSetting),
+				tasks,
+			);
+		}
 	}
 }

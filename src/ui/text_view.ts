@@ -150,10 +150,10 @@ ${parsed.body}
 	async onOpen() {
 		this.mountMainComponent();
 
-		const gearEl = this.addAction("gear", "Kanban settings", () =>
+		const gearElement = this.addAction("gear", "Kanban settings", () =>
 			this.openSettingsModal()
 		);
-		this.headerCountersController.mount(gearEl);
+		this.headerCountersController.mount(gearElement);
 	}
 
 	async onClose() {

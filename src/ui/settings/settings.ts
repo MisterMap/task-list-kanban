@@ -2,7 +2,7 @@
 
 import { App, Modal, Setting } from "obsidian";
 
-import type { SettingValues } from "./settings_store";
+import type { HeaderCounterSettings, SettingValues } from "./settings_store";
 
 export class SettingsModal extends Modal {
 	constructor(
@@ -12,6 +12,105 @@ export class SettingsModal extends Modal {
 	) {
 		super(app);
 	}
+
+	private addHeaderCounterSettings(
+		headerCountersContainer: HTMLElement,
+		headerCounterSettings: HeaderCounterSettings,
+		headerCounterIndex: number,
+	) {
+		const headerCounterContainer = headerCountersContainer.createDiv({
+			cls: "kanban-header-counter-settings",
+		});
+
+		new Setting(headerCounterContainer)
+			.setName(`Header counter ${headerCounterIndex + 1}`)
+			.setDesc("Adjust this counter or delete it.")
+			.addButton((button) => {
+				button
+					.setIcon("trash")
+					.setTooltip("Delete header counter")
+					.onClick(() => {
+						this.settings.headerCounters.splice(headerCounterIndex, 1);
+						this.renderHeaderCounterSettings(headerCountersContainer);
+					});
+			});
+
+		new Setting(headerCounterContainer)
+			.setName("Label")
+			.setDesc("Text shown before this header counter.")
+			.addText((text) => {
+				text.setValue(headerCounterSettings.label);
+				text.onChange((value) => {
+					headerCounterSettings.label = value;
+				});
+			});
+
+		new Setting(headerCounterContainer)
+			.setName("Filter")
+			.setDesc('Examples: "tags: #plan", "priority: #p0, #p1", "due: < today() + 7d tags: #plan"')
+			.addText((text) => {
+				text.setValue(headerCounterSettings.filter);
+				text.onChange((value) => {
+					headerCounterSettings.filter = value;
+				});
+			});
+
+		new Setting(headerCounterContainer)
+			.setName("Max")
+			.setDesc("Max allowed for this counter. Empty means no max.")
+			.addText((text) => {
+				text.setPlaceholder("");
+				text.setValue(
+					headerCounterSettings.maxTasks === undefined
+						? ""
+						: String(headerCounterSettings.maxTasks)
+				);
+				text.onChange((value) => {
+					const trimmedValue = value.trim();
+					if (!trimmedValue) {
+						headerCounterSettings.maxTasks = undefined;
+						return;
+					}
+					const parsedMaxTasks = parseInt(trimmedValue, 10);
+					headerCounterSettings.maxTasks = Number.isNaN(parsedMaxTasks)
+						? undefined
+						: Math.max(0, parsedMaxTasks);
+				});
+			});
+	}
+
+	private renderHeaderCounterSettings(headerCountersContainer: HTMLElement) {
+		headerCountersContainer.empty();
+
+		new Setting(headerCountersContainer)
+			.setName("Header counters")
+			.setDesc("Counters shown near the settings gear.")
+			.addButton((button) => {
+				button
+					.setIcon("plus")
+					.setTooltip("Add header counter")
+					.onClick(() => {
+						this.settings.headerCounters.push({
+							label: "Counter",
+							filter: "",
+							maxTasks: undefined,
+						});
+						this.renderHeaderCounterSettings(headerCountersContainer);
+					});
+			});
+
+		for (const [
+			headerCounterIndex,
+			headerCounterSettings,
+		] of this.settings.headerCounters.entries()) {
+			this.addHeaderCounterSettings(
+				headerCountersContainer,
+				headerCounterSettings,
+				headerCounterIndex,
+			);
+		}
+	}
+
 	onOpen() {
 		this.contentEl.createEl("h1", { text: "Settings" });
 
@@ -20,7 +119,7 @@ export class SettingsModal extends Modal {
 			.setDesc('The column names and max tasks separated by a comma "," and colon ":" for max tasks')
 			.setClass("column")
 			.addText((text) => {
-				text.setValue(this.settings.columns.map(c => `${c.name}:${c.maxTasks}`).join(", "));
+				text.setValue(this.settings.columns.map(column => `${column.name}:${column.maxTasks}`).join(", "));
 				text.onChange((value) => {
 					this.settings.columns = value.split(",").map((column) => {
 						const [name, maxTasks] = column.split(":");
@@ -63,51 +162,10 @@ export class SettingsModal extends Modal {
 				});
 			});
 
-		new Setting(this.contentEl)
-			.setName("Total next week max")
-			.setDesc("Max allowed for 'Total next week'. Empty means no max.")
-			.addText((text) => {
-				text.setPlaceholder("");
-				text.setValue(
-					this.settings.totalNextWeekMax === undefined
-						? ""
-						: String(this.settings.totalNextWeekMax)
-				);
-				text.onChange((value) => {
-					const trimmed = value.trim();
-					if (!trimmed) {
-						this.settings.totalNextWeekMax = undefined;
-						return;
-					}
-					const parsed = parseInt(trimmed, 10);
-					this.settings.totalNextWeekMax = Number.isNaN(parsed)
-						? undefined
-						: Math.max(0, parsed);
-				});
-			});
-
-		new Setting(this.contentEl)
-			.setName("Critical next week max")
-			.setDesc("Max allowed for 'Critical next week'. Empty means no max.")
-			.addText((text) => {
-				text.setPlaceholder("");
-				text.setValue(
-					this.settings.criticalNextWeekMax === undefined
-						? ""
-						: String(this.settings.criticalNextWeekMax)
-				);
-				text.onChange((value) => {
-					const trimmed = value.trim();
-					if (!trimmed) {
-						this.settings.criticalNextWeekMax = undefined;
-						return;
-					}
-					const parsed = parseInt(trimmed, 10);
-					this.settings.criticalNextWeekMax = Number.isNaN(parsed)
-						? undefined
-						: Math.max(0, parsed);
-				});
-			});
+		const headerCountersContainer = this.contentEl.createDiv({
+			cls: "kanban-header-counters-settings",
+		});
+		this.renderHeaderCounterSettings(headerCountersContainer);
 
 		new Setting(this.contentEl)
 			.setName("Match Pattern")
@@ -138,8 +196,8 @@ export class SettingsModal extends Modal {
 				text.setValue(sortOrder.join(", "));
 				text.onChange((value) => {
 					this.settings.sortOrder = (value.split(",")
-						.map(s => s.trim())
-						.filter(s => ["priority", "dueDate", "statusChanged", "created", "path", "rowIndex"].includes(s))) as Array<"priority" | "dueDate" | "statusChanged" | "created" | "path" | "rowIndex">;
+						.map(sortOrderValue => sortOrderValue.trim())
+						.filter(sortOrderValue => ["priority", "dueDate", "statusChanged", "created", "path", "rowIndex"].includes(sortOrderValue))) as Array<"priority" | "dueDate" | "statusChanged" | "created" | "path" | "rowIndex">;
 					// Ensure at least one sort order
 					if (this.settings.sortOrder.length === 0) {
 						this.settings.sortOrder = ["priority"];
@@ -147,8 +205,8 @@ export class SettingsModal extends Modal {
 				});
 			});
 
-		new Setting(this.contentEl).addButton((btn) =>
-			btn.setButtonText("Save").onClick(() => {
+		new Setting(this.contentEl).addButton((button) =>
+			button.setButtonText("Save").onClick(() => {
 				this.close();
 				this.onSubmit(this.settings);
 			})

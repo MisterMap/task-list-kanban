@@ -40,6 +40,31 @@ If your plugin does not need CSS, delete this file.
 	width: 100%;
 }
 
+.kanban-header-counters-settings {
+	margin-top: var(--size-4-4);
+}
+
+.kanban-header-counter-settings {
+	margin-top: var(--size-4-3);
+	padding: var(--size-4-2) var(--size-4-3);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+}
+
+.kanban-header-counter-settings .setting-item {
+	padding-top: var(--size-4-1);
+	padding-bottom: var(--size-4-1);
+	border-top: 0;
+}
+
+.kanban-header-counter-settings .setting-item:first-child {
+	padding-top: 0;
+}
+
+.kanban-header-counter-settings .setting-item:last-child {
+	padding-bottom: 0;
+}
+
 .task-count,
 .kanban-header-count {
 	color: white;
