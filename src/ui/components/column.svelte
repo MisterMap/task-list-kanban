@@ -13,6 +13,10 @@
 	import IconButton from "./icon_button.svelte";
 	import { isDraggingStore } from "../dnd/store";
 	import type { Readable } from "svelte/store";
+	import {
+		getColumnColorValue,
+		type ColumnColor,
+	} from "../settings/column_colors";
 
 	export let column: ColumnTag | DefaultColumns;
 	export let hideOnEmpty: boolean = false;
@@ -21,6 +25,7 @@
 	export let columnTagTableStore: Readable<ColumnTagTable>;
 	export let displayTagsInFooter: boolean;
 	export let sortOrder: SortOrder[] = ["priority"];
+	export let doneColumnColor: ColumnColor = "green";
 
 	function getColumnTitle(
 		column: ColumnTag | DefaultColumns,
@@ -37,6 +42,22 @@
 	}
 
 	$: columnTitle = getColumnTitle(column, $columnTagTableStore);
+
+	function getColumnColor(
+		column: ColumnTag | DefaultColumns,
+		columnTagTable: ColumnTagTable,
+	): ColumnColor {
+		if (column === "done") {
+			return doneColumnColor;
+		}
+		if (column === "uncategorised") {
+			return "none";
+		}
+		return columnTagTable[column]?.color ?? "none";
+	}
+
+	$: columnColor = getColumnColor(column, $columnTagTableStore);
+	$: columnBackgroundColor = getColumnColorValue(columnColor);
 
 	$: sortedTasks = sortTasks([...tasks], sortOrder);
 
@@ -136,45 +157,49 @@
 		class="column"
 		class:drop-active={!!draggingData}
 		class:drop-hover={isDraggedOver}
+		style={`--column-background: ${columnBackgroundColor};`}
 		on:dragover={handleDragOver}
 		on:dragleave={handleDragLeave}
 		on:drop={handleDrop}
 	>
-		<div class="header">
-			<h2>
-				{columnTitle}
-				<span class="task-count" class:highlight={isMoreThanMaxTasks(column, tasks)}>
-					{getTaskCountText(column, tasks)}
-				</span>
-			</h2>
-			{#if column === "done"}
-				<IconButton icon="lucide-more-vertical" on:click={showMenu} />
-			{/if}
-		</div>
-		<div class="tasks-wrapper">
-			<div class="tasks">
-				{#each sortedTasks as task}
-					<TaskComponent
-						{task}
-						{taskActions}
-						{columnTagTableStore}
-						{displayTagsInFooter}
-					/>
-				{/each}
-				{#if isColumnTag(column, columnTagTableStore)}
-					<button
-						on:click={async (e) => {
-							if (isColumnTag(column, columnTagTableStore)) {
-								await taskActions.addNew(column, e);
-							}
-						}}
-					>
-						<span bind:this={buttonEl} />
-						Add new
-					</button>
+		<div class="colored-column-content">
+			<div class="header">
+				<h2>
+					{columnTitle}
+					<span class="task-count" class:highlight={isMoreThanMaxTasks(column, tasks)}>
+						{getTaskCountText(column, tasks)}
+					</span>
+				</h2>
+				{#if column === "done"}
+					<IconButton icon="lucide-more-vertical" on:click={showMenu} />
 				{/if}
 			</div>
+			<div class="tasks-wrapper">
+				<div class="tasks">
+					{#each sortedTasks as task}
+						<TaskComponent
+							{task}
+							{taskActions}
+							{columnTagTableStore}
+							{displayTagsInFooter}
+						/>
+					{/each}
+				</div>
+			</div>
 		</div>
+		{#if isColumnTag(column, columnTagTableStore)}
+			<button
+				class="add-new-button"
+				on:click={async (e) => {
+					if (isColumnTag(column, columnTagTableStore)) {
+						await taskActions.addNew(column, e);
+					}
+				}}
+			>
+				<span bind:this={buttonEl} />
+				Add new
+			</button>
+		{/if}
 	</div>
 {/if}
 
@@ -186,8 +211,9 @@
 		width: 240px;
 		flex-shrink: 0;
 		padding: 0;
+		box-sizing: border-box;
 		border-radius: var(--radius-m);
-		background-color: white;
+		background-color: var(--background-primary);
 		border: none;
 
 		&.drop-active {
@@ -204,6 +230,12 @@
 			}
 		}
 
+		.colored-column-content {
+			padding: var(--size-4-2);
+			border-radius: var(--radius-m);
+			background-color: var(--column-background);
+		}
+
 		.header {
 			display: flex;
 			justify-content: space-between;
@@ -212,9 +244,14 @@
 			flex-shrink: 0;
 
 			h2 {
+				width: 100%;
+				box-sizing: border-box;
 				font-size: var(--font-ui-larger);
 				font-weight: var(--font-bold);
 				margin: 0;
+				padding: var(--size-4-1) var(--size-4-2);
+				border-radius: var(--radius-m);
+				background-color: transparent;
 
 				.task-count {
 					border-radius: 12px;
@@ -237,16 +274,21 @@
 				flex-direction: column;
 				gap: var(--size-4-3);
 
-				button {
-					display: flex;
-					align-items: center;
-					cursor: pointer;
-					box-shadow: none; // Add this line to remove the shadow
+			}
+		}
 
-					span {
-						height: 18px;
-					}
-				}
+		.add-new-button {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			margin-top: var(--size-4-2);
+			cursor: pointer;
+			box-shadow: none;
+			background-color: var(--background-primary);
+
+			span {
+				height: 18px;
 			}
 		}
 	}

@@ -1,0 +1,1 @@
+* No magic constant in files. Prefer css files

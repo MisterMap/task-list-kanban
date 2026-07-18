@@ -73,7 +73,11 @@
 
 	$: tasksByColumn = groupByColumnTag(filteredByTag);
 
-	$: ({displayTagsInFooter = false, sortOrder = ["priority"] } = $settingsStore);
+	$: ({
+		displayTagsInFooter = false,
+		sortOrder = ["priority"],
+		doneColumnColor = "green",
+	} = $settingsStore);
 </script>
 
 <div class="main">
@@ -87,6 +91,7 @@
 				{columnTagTableStore}
 				{displayTagsInFooter}
 				{sortOrder}
+				{doneColumnColor}
 			/>
 			{#each columns as column}
 				<Column
@@ -96,6 +101,7 @@
 					{columnTagTableStore}
 					{displayTagsInFooter}
 					{sortOrder}
+					{doneColumnColor}
 				/>
 			{/each}
 			<Column
@@ -105,6 +111,7 @@
 				{columnTagTableStore}
 				{displayTagsInFooter}
 				{sortOrder}
+				{doneColumnColor}
 			/>
 		</div>
 	</div>
@@ -125,7 +132,7 @@
 
 			> div {
 				display: flex;
-				gap: var(--size-4-4);
+				gap: var(--size-4-1);
 				background-color: white;
 			}
 

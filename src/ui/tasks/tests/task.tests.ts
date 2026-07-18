@@ -15,7 +15,11 @@ vi.mock("../date_utils", async (importOriginal) => {
 
 describe("Task", () => {
 	const columnTags: ColumnTagTable = {
-		[kebab<ColumnTag>("column")]: { name: "column", maxTasks: -1 },
+		[kebab<ColumnTag>("column")]: {
+			name: "column",
+			maxTasks: -1,
+			color: "none",
+		},
 	};
 
 	const mockDate = new Date("2024-03-20T00:00:00.000Z");

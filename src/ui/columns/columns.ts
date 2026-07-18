@@ -1,12 +1,15 @@
 import type { Brand } from "src/brand";
 import { kebab } from "src/parsing/kebab/kebab";
 import { derived, get, type Readable, type Writable } from "svelte/store";
-import type { SettingValues } from "../settings/settings_store";
+import type { ColumnColor, SettingValues } from "../settings/settings_store";
 
 export type DefaultColumns = "uncategorised" | "done";
 export type ColumnTag = Brand<string, "ColumnTag">;
 
-export type ColumnTagTable = Record<ColumnTag, { name: string; maxTasks: number }>;
+export type ColumnTagTable = Record<
+	ColumnTag,
+	{ name: string; maxTasks?: number; color: ColumnColor }
+>;
 
 export const createColumnTagTableStore = (
 	settingsStore: Writable<SettingValues>

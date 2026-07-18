@@ -2,7 +2,16 @@
 
 import { App, Modal, Setting } from "obsidian";
 
-import type { HeaderCounterSettings, SettingValues } from "./settings_store";
+import {
+	type ColumnSettings,
+	type HeaderCounterSettings,
+	type SettingValues,
+} from "./settings_store";
+import {
+	columnColorDefinitions,
+	columnColors,
+	type ColumnColor,
+} from "./column_colors";
 
 export class SettingsModal extends Modal {
 	constructor(
@@ -11,6 +20,116 @@ export class SettingsModal extends Modal {
 		private readonly onSubmit: (newSettings: SettingValues) => void
 	) {
 		super(app);
+	}
+
+	private addColumnColorDropdown(
+		setting: Setting,
+		selectedColor: ColumnColor,
+		onChange: (columnColor: ColumnColor) => void,
+	) {
+		setting.addDropdown((dropdown) => {
+			for (const columnColor of columnColors) {
+				dropdown.addOption(
+					columnColor,
+					columnColorDefinitions[columnColor].label,
+				);
+			}
+			dropdown.setValue(selectedColor);
+			dropdown.onChange((value) => {
+				onChange(value as ColumnColor);
+			});
+		});
+	}
+
+	private addColumnSettings(
+		columnsContainer: HTMLElement,
+		columnSettings: ColumnSettings,
+		columnIndex: number,
+	) {
+		const columnContainer = columnsContainer.createDiv({
+			cls: "kanban-column-settings",
+		});
+
+		new Setting(columnContainer)
+			.setName(`Column ${columnIndex + 1}`)
+			.setDesc("Configure this column or delete it.")
+			.addButton((button) => {
+				button
+					.setIcon("trash")
+					.setTooltip("Delete column")
+					.onClick(() => {
+						this.settings.columns.splice(columnIndex, 1);
+						this.renderColumnSettings(columnsContainer);
+					});
+			});
+
+		new Setting(columnContainer)
+			.setName("Name")
+			.addText((text) => {
+				text.setValue(columnSettings.name);
+				text.onChange((value) => {
+					columnSettings.name = value;
+				});
+			});
+
+		new Setting(columnContainer)
+			.setName("Max tasks")
+			.setDesc("Leave empty for no limit. Existing -1 values are also treated as no limit.")
+			.addText((text) => {
+				text.setPlaceholder("No limit");
+				text.setValue(
+					columnSettings.maxTasks === undefined || columnSettings.maxTasks === -1
+						? ""
+						: String(columnSettings.maxTasks),
+				);
+				text.onChange((value) => {
+					const trimmedValue = value.trim();
+					if (!trimmedValue) {
+						columnSettings.maxTasks = undefined;
+						return;
+					}
+					const maxTasks = Number.parseInt(trimmedValue, 10);
+					if (maxTasks === -1) {
+						columnSettings.maxTasks = undefined;
+					} else if (!Number.isNaN(maxTasks) && maxTasks >= 0) {
+						columnSettings.maxTasks = maxTasks;
+					}
+				});
+			});
+
+		const colorSetting = new Setting(columnContainer).setName("Color");
+		this.addColumnColorDropdown(
+			colorSetting,
+			columnSettings.color,
+			(columnColor) => {
+				columnSettings.color = columnColor;
+			},
+		);
+	}
+
+	private renderColumnSettings(columnsContainer: HTMLElement) {
+		columnsContainer.empty();
+
+		new Setting(columnsContainer)
+			.setName("Columns")
+			.setDesc("Configure column names, task limits, and colors.")
+			.addButton((button) => {
+				button
+					.setIcon("plus")
+					.setTooltip("Add column")
+					.onClick(() => {
+						this.settings.columns.push({
+							name: "New column",
+							maxTasks: undefined,
+							color: "none",
+						});
+						this.renderColumnSettings(columnsContainer);
+					});
+			});
+
+		for (const [columnIndex, columnSettings] of this.settings.columns.entries()) {
+			this.addColumnSettings(columnsContainer, columnSettings, columnIndex);
+		}
 	}
 
 	private addHeaderCounterSettings(
@@ -112,23 +231,50 @@ export class SettingsModal extends Modal {
 	}
 
 	onOpen() {
+		this.contentEl.addClass("kanban-settings-modal");
 		this.contentEl.createEl("h1", { text: "Settings" });
+		this.contentEl.createEl("h2", {
+			text: "Column settings",
+			cls: "kanban-settings-section-heading",
+		});
 
-		new Setting(this.contentEl)
-			.setName("Columns")
-			.setDesc('The column names and max tasks separated by a comma "," and colon ":" for max tasks')
-			.setClass("column")
-			.addText((text) => {
-				text.setValue(this.settings.columns.map(column => `${column.name}:${column.maxTasks}`).join(", "));
-				text.onChange((value) => {
-					this.settings.columns = value.split(",").map((column) => {
-						const [name, maxTasks] = column.split(":");
-						return { name: name?.trim() ?? "", maxTasks: parseInt(maxTasks ?? "10", 10) || 10 };
-					});
-				});
-			});
+		const columnsContainer = this.contentEl.createDiv({
+			cls: "kanban-columns-settings",
+		});
+		this.renderColumnSettings(columnsContainer);
 
-		new Setting(this.contentEl)
+		const doneColumnSettingsContainer = this.contentEl.createDiv({
+			cls: "kanban-setting-card",
+		});
+		const doneColumnColorSetting = new Setting(doneColumnSettingsContainer)
+			.setName("Done column color")
+			.setDesc("Color used by the built-in Done column.");
+		this.addColumnColorDropdown(
+			doneColumnColorSetting,
+			this.settings.doneColumnColor,
+			(columnColor) => {
+				this.settings.doneColumnColor = columnColor;
+			},
+		);
+
+		this.contentEl.createEl("h2", {
+			text: "Header counter settings",
+			cls: "kanban-settings-section-heading",
+		});
+		const headerCountersContainer = this.contentEl.createDiv({
+			cls: "kanban-header-counters-settings",
+		});
+		this.renderHeaderCounterSettings(headerCountersContainer);
+
+		this.contentEl.createEl("h2", {
+			text: "Other settings",
+			cls: "kanban-settings-section-heading",
+		});
+		const otherSettingsContainer = this.contentEl.createDiv({
+			cls: "kanban-setting-card",
+		});
+
+		new Setting(otherSettingsContainer)
 			.setName("Folder scope")
 			.setDesc("Where should we try to find tasks for this Kanban?")
 				.addDropdown((dropdown) => {
@@ -140,7 +286,7 @@ export class SettingsModal extends Modal {
 					});
 				});
 
-		new Setting(this.contentEl)
+		new Setting(otherSettingsContainer)
 			.setName("Show filepath")
 			.setDesc("Show the filepath on each task in Kanban?")
 			.addToggle((toggle) => {
@@ -150,7 +296,7 @@ export class SettingsModal extends Modal {
 				});
 			});
 
-		new Setting(this.contentEl)
+		new Setting(otherSettingsContainer)
 			.setName("Display tags in footer")
 			.setDesc(
 				"Display tags as badges in the footer? If off, tags remain in task text."
@@ -162,12 +308,7 @@ export class SettingsModal extends Modal {
 				});
 			});
 
-		const headerCountersContainer = this.contentEl.createDiv({
-			cls: "kanban-header-counters-settings",
-		});
-		this.renderHeaderCounterSettings(headerCountersContainer);
-
-		new Setting(this.contentEl)
+		new Setting(otherSettingsContainer)
 			.setName("Match Pattern")
 			.setDesc("Pattern to match tasks during creation")
 			.addText((text) => {
@@ -178,7 +319,7 @@ export class SettingsModal extends Modal {
 				});
 			});
 
-		new Setting(this.contentEl)
+		new Setting(otherSettingsContainer)
 			.setName("No Match Pattern")
 			.setDesc("Pattern to exclude tasks during creation")
 			.addText((text) => {
@@ -188,7 +329,7 @@ export class SettingsModal extends Modal {
 				});
 			});
 
-		new Setting(this.contentEl)
+		new Setting(otherSettingsContainer)
 			.setName("Sort Order")
 			.setDesc('Comma-separated list of sort criteria (e.g., "priority, dueDate, statusChanged"). Available: priority, dueDate, statusChanged, created, path, rowIndex')
 			.addText((text) => {

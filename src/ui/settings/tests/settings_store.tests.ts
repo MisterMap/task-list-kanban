@@ -86,4 +86,49 @@ describe("settings store", () => {
 		expect(settings.headerCounters).toHaveLength(3);
 		expect(settings.headerCounters[2]?.label).toBe("Fixes");
 	});
+
+	it("uses no color for columns saved before color settings existed", () => {
+		const settings = parseSettingsString(
+			JSON.stringify({
+				columns: [
+					{ name: "Today", maxTasks: 4 },
+					{ name: "Custom", maxTasks: 8 },
+				],
+			}),
+		);
+
+		expect(settings.columns).toEqual([
+			{ name: "Today", maxTasks: 4, color: "none" },
+			{ name: "Custom", maxTasks: 8, color: "none" },
+		]);
+		expect(settings.doneColumnColor).toBe("green");
+	});
+
+	it("keeps explicitly configured column colors", () => {
+		const settings = parseSettingsString(
+			JSON.stringify({
+				columns: [
+					{ name: "Today", maxTasks: 4, color: "blue" },
+				],
+				doneColumnColor: "none",
+			}),
+		);
+
+		expect(settings.columns[0]?.color).toBe("blue");
+		expect(settings.doneColumnColor).toBe("none");
+	});
+
+	it("treats missing and -1 column limits as no limit", () => {
+		const settings = parseSettingsString(
+			JSON.stringify({
+				columns: [
+					{ name: "Without limit", color: "none" },
+					{ name: "Legacy limit", maxTasks: -1, color: "none" },
+				],
+			}),
+		);
+
+		expect(settings.columns[0]?.maxTasks).toBeUndefined();
+		expect(settings.columns[1]?.maxTasks).toBeUndefined();
+	});
 });

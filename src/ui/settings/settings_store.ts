@@ -2,8 +2,21 @@
 
 import { writable } from "svelte/store";
 import { z } from "zod";
+import {
+	columnColorObject,
+	type ColumnColor,
+} from "./column_colors";
 
-const defaultColumns = [{ name: "Later", maxTasks: 10 }, { name: "Soonish", maxTasks: 10 }, { name: "Next week", maxTasks: 10 }, { name: "This week", maxTasks: 10 }, { name: "Today", maxTasks: 10 }, { name: "Pending", maxTasks: 10 }];
+export type { ColumnColor } from "./column_colors";
+
+const defaultColumns = [
+	{ name: "Later", maxTasks: 10, color: "none" as ColumnColor },
+	{ name: "Soonish", maxTasks: 10, color: "none" as ColumnColor },
+	{ name: "Next week", maxTasks: 10, color: "none" as ColumnColor },
+	{ name: "This week", maxTasks: 10, color: "blue" as ColumnColor },
+	{ name: "Today", maxTasks: 10, color: "orange" as ColumnColor },
+	{ name: "Pending", maxTasks: 10, color: "none" as ColumnColor },
+];
 
 const totalHeaderCounterDefaults = {
 	label: "Total",
@@ -36,8 +49,18 @@ const headerCounterSettingsObject = z.object({
 	maxTasks: z.number().int().nonnegative().optional(),
 });
 
+const columnSettingsObject = z.object({
+	name: z.string(),
+	maxTasks: z.preprocess(
+		(maxTasks) => maxTasks === -1 ? undefined : maxTasks,
+		z.number().int().nonnegative().optional(),
+	),
+	color: columnColorObject.default("none"),
+});
+
 const settingsObject = z.object({
-	columns: z.array(z.object({ name: z.string(), maxTasks: z.number().default(10) })).default(createDefaultColumns),
+	columns: z.array(columnSettingsObject).default(createDefaultColumns),
+	doneColumnColor: columnColorObject.default("green"),
 	scope: z.union([z.literal("everywhere"), z.literal("folder")]).default("folder"),
 	showFilepath: z.boolean().default(true).optional(),
 	displayTagsInFooter: z.boolean().default(false).optional(),
@@ -58,9 +81,11 @@ const settingsObject = z.object({
 
 export type SettingValues = z.infer<typeof settingsObject>;
 export type HeaderCounterSettings = SettingValues["headerCounters"][number];
+export type ColumnSettings = SettingValues["columns"][number];
 
 const defaultSettings: SettingValues = {
 	columns: createDefaultColumns(),
+	doneColumnColor: "green",
 	scope: "folder",
 	showFilepath: true,
 	displayTagsInFooter: false,
