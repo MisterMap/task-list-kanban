@@ -132,7 +132,7 @@
 
 			> div {
 				display: flex;
-				gap: var(--size-4-1);
+				gap: var(--size-2-1);
 				background-color: white;
 			}
 

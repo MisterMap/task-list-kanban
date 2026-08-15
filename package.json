@@ -15,6 +15,7 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@smui-extra/autocomplete": "^7.0.0",
+		"@sveltejs/vite-plugin-svelte": "^3.1.2",
 		"@tsconfig/svelte": "^5.0.4",
 		"@types/crypto-js": "^4.2.2",
 		"@types/node": "^20.12.12",

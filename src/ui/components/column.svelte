@@ -175,16 +175,14 @@
 				{/if}
 			</div>
 			<div class="tasks-wrapper">
-				<div class="tasks">
-					{#each sortedTasks as task}
-						<TaskComponent
-							{task}
-							{taskActions}
-							{columnTagTableStore}
-							{displayTagsInFooter}
-						/>
-					{/each}
-				</div>
+				{#each sortedTasks as task}
+					<TaskComponent
+						{task}
+						{taskActions}
+						{columnTagTableStore}
+						{displayTagsInFooter}
+					/>
+				{/each}
 			</div>
 		</div>
 		{#if isColumnTag(column, columnTagTableStore)}
@@ -218,21 +216,19 @@
 
 		&.drop-active {
 			.tasks-wrapper {
-				.tasks {
-					opacity: 0.4;
-				}
+				opacity: 0.4;
 			}
 
 			&.drop-hover {
 				.tasks-wrapper {
 					border-color: var(--color-base-70);
+					border: var(--size-2-2) dashed;
 				}
 			}
 		}
 
 		.colored-column-content {
-			padding: var(--size-4-2);
-			border-radius: var(--radius-m);
+			border-radius: calc(var(--radius-m) + var(--size-2-2));
 			background-color: var(--column-background);
 		}
 
@@ -264,17 +260,14 @@
 		}
 
 		.tasks-wrapper {
+			padding: 0;
+			display: flex;
+			flex-direction: column;
+			gap: var(--size-2-3);
 			height: 100%;
 			min-height: 50px;
-			border: var(--border-width) dashed transparent;
-			border-radius: var(--radius-m);
-
-			.tasks {
-				display: flex;
-				flex-direction: column;
-				gap: var(--size-4-3);
-
-			}
+			border: var(--size-2-2) dashed transparent;
+			border-radius: calc(var(--radius-m) + var(--size-2-2));
 		}
 
 		.add-new-button {
