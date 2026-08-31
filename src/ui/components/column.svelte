@@ -171,7 +171,9 @@
 					</span>
 				</h2>
 				{#if column === "done"}
-					<IconButton icon="lucide-more-vertical" on:click={showMenu} />
+					<div class="column-menu-button">
+						<IconButton icon="lucide-more-vertical" on:click={showMenu} />
+					</div>
 				{/if}
 			</div>
 			<div class="tasks-wrapper">
@@ -256,6 +258,10 @@
 					margin-left: 8px;
 					font-weight: var(--font-normal);
 				}
+			}
+
+			.column-menu-button {
+				margin-right: calc(var(--size-4-2) + var(--size-2-2));
 			}
 		}
 
